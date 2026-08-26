@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gleb Chernenko — AI Motion Designer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Unbounded:wght@200;400;700;900&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#060608;--surface:#0d0d12;
+  --a1:#ff3c5a;--a2:#00f5c8;--a3:#a259ff;
+  --text:#f0eeff;--muted:#4a4a6a;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;overflow-x:hidden;cursor:none}
+#cursor{position:fixed;width:12px;height:12px;background:var(--a2);border-radius:50%;pointer-events:none;z-index:9999;transition:transform .15s;mix-blend-mode:difference}
+#cursor-ring{position:fixed;width:40px;height:40px;border:1px solid var(--a2);border-radius:50%;pointer-events:none;z-index:9998;transition:transform .4s cubic-bezier(.23,1,.32,1),opacity .3s;opacity:.5}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");opacity:.035;pointer-events:none;z-index:9997}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.2rem 6vw;background:rgba(6,6,8,.8);backdrop-filter:blur(12px);border-bottom:1px solid rgba(74,74,106,.2)}
+.nav-logo{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--text);text-decoration:none}
+.nav-logo span{color:var(--a2)}
+.nav-links{display:flex;gap:2rem}
+.nav-links a{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .3s;cursor:none}
+.nav-links a:hover{color:var(--a2)}
+
+/* HERO */
+#hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 6vw;overflow:hidden}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,60,90,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,60,90,.05) 1px,transparent 1px);background-size:60px 60px;animation:gridShift 20s linear infinite}
+@keyframes gridShift{from{background-position:0 0}to{background-position:60px 60px}}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
+.o1{width:500px;height:500px;background:rgba(255,60,90,.15);top:-100px;right:-50px;animation:f1 8s ease-in-out infinite}
+.o2{width:350px;height:350px;background:rgba(0,245,200,.1);bottom:-50px;left:10%;animation:f2 11s ease-in-out infinite}
+.o3{width:250px;height:250px;background:rgba(162,89,255,.12);top:40%;right:20%;animation:f3 7s ease-in-out infinite}
+@keyframes f1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,40px) scale(1.1)}}
+@keyframes f2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(.9)}}
+@keyframes f3{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,20px)}}
+.hero-label{font-size:clamp(10px,1.2vw,13px);letter-spacing:.3em;color:var(--a2);text-transform:uppercase;margin-bottom:1.5rem;opacity:0;animation:fadeUp .8s .2s forwards}
+.hero-name{font-family:'Unbounded',sans-serif;font-size:clamp(48px,10vw,130px);font-weight:900;line-height:.9;letter-spacing:-.03em;opacity:0;animation:fadeUp .8s .4s forwards}
+.hero-name span{display:block;color:#fff;background:none;-webkit-text-fill-color:#fff;-webkit-background-clip:initial;background-clip:initial}
+.hero-name .outline{-webkit-text-stroke:0;background:none;-webkit-text-fill-color:#fff;color:#fff}
+.hero-role{font-family:'Unbounded',sans-serif;font-size:clamp(12px,1.8vw,20px);font-weight:200;color:var(--muted);margin-top:1.5rem;letter-spacing:.08em;opacity:0;animation:fadeUp .8s .6s forwards}
+.hero-role em{color:var(--a2);font-style:normal}
+.hero-badges{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.5rem;opacity:0;animation:fadeUp .8s .7s forwards}
+.hero-badge{font-size:10px;letter-spacing:.2em;text-transform:uppercase;padding:.4rem 1rem;border:1px solid;border-radius:2px}
+.hero-badge.b1{border-color:var(--a1);color:var(--a1)}
+.hero-badge.b2{border-color:var(--a2);color:var(--a2)}
+.hero-badge.b3{border-color:var(--a3);color:var(--a3)}
+.hero-cta{display:inline-flex;align-items:center;gap:1rem;margin-top:2.5rem;padding:1rem 2rem;border:1px solid var(--a1);color:var(--a1);font-family:'Space Mono',monospace;font-size:13px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;position:relative;overflow:hidden;transition:color .3s;opacity:0;animation:fadeUp .8s .8s forwards;cursor:none}
+.hero-cta::before{content:'';position:absolute;inset:0;background:var(--a1);transform:translateX(-101%);transition:transform .4s cubic-bezier(.23,1,.32,1)}
+.hero-cta:hover::before{transform:translateX(0)}
+.hero-cta:hover{color:var(--bg)}
+.hero-cta span{position:relative;z-index:1}
+.scroll-hint{position:absolute;bottom:2rem;left:6vw;font-size:11px;letter-spacing:.25em;color:var(--muted);display:flex;align-items:center;gap:.75rem;opacity:0;animation:fadeIn 1s 1.5s forwards}
+.scroll-hint::before{content:'';display:block;width:30px;height:1px;background:var(--muted)}
+
+/* MARQUEE */
+.marquee-wrap{padding:2rem 0;border-top:1px solid var(--muted);border-bottom:1px solid var(--muted);overflow:hidden;margin:0}
+.marquee-track{display:flex;gap:3rem;animation:marquee 18s linear infinite;white-space:nowrap}
+.marquee-item{font-family:'Unbounded',sans-serif;font-size:clamp(13px,1.8vw,20px);font-weight:200;color:var(--muted);flex-shrink:0}
+.marquee-item span{color:var(--a1)}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SECTIONS common */
+.section-label{font-size:11px;letter-spacing:.4em;color:var(--a3);text-transform:uppercase;margin-bottom:3rem}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .7s,transform .7s cubic-bezier(.23,1,.32,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ABOUT */
+#about{padding:7rem 6vw 5rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+@media(max-width:768px){#about{grid-template-columns:1fr}}
+.about-left h2{font-family:'Unbounded',sans-serif;font-size:clamp(28px,4vw,52px);font-weight:900;line-height:1;margin-bottom:1.5rem}
+.about-left h2 span{color:var(--a2)}
+.about-text{font-size:13px;line-height:2;color:rgba(240,238,255,.65);margin-bottom:2rem}
+.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--muted);margin-top:2rem}
+.stat{background:var(--bg);padding:1.5rem;text-align:center}
+.stat-num{font-family:'Unbounded',sans-serif;font-size:32px;font-weight:900;color:var(--a1)}
+.stat-label{font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-top:.3rem}
+.about-right{}
+.ai-stack-block{background:var(--surface);padding:2rem;border-left:2px solid var(--a2)}
+.ai-stack-title{font-size:10px;letter-spacing:.3em;color:var(--a2);text-transform:uppercase;margin-bottom:1.5rem}
+.ai-row{margin-bottom:1.2rem}
+.ai-row-label{font-size:10px;letter-spacing:.2em;color:var(--a1);text-transform:uppercase;margin-bottom:.4rem}
+.ai-row-tools{font-size:11px;color:rgba(240,238,255,.55);line-height:1.6}
+
+/* SKILLS */
+#skills{padding:5rem 6vw;position:relative}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;background:var(--muted)}
+.skill-card{background:var(--bg);padding:2.5rem 2rem;position:relative;overflow:hidden;transition:background .4s;cursor:none}
+.skill-card::before{content:'';position:absolute;inset:0;background:var(--surface);opacity:0;transition:opacity .4s}
+.skill-card:hover::before{opacity:1}
+.skill-card:hover .skill-accent{transform:scale(8);opacity:.06}
+.skill-accent{position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;transition:transform .6s cubic-bezier(.23,1,.32,1),opacity .4s}
+.skill-num{font-family:'Unbounded',sans-serif;font-size:11px;color:var(--muted);letter-spacing:.3em;margin-bottom:1.5rem;position:relative}
+.skill-title{font-family:'Unbounded',sans-serif;font-size:clamp(16px,2vw,24px);font-weight:700;line-height:1.1;margin-bottom:1rem;position:relative}
+.skill-desc{font-size:11px;line-height:1.8;color:var(--muted);position:relative}
+
+/* AI WORKS GALLERY */
+#ai-works{padding:5rem 6vw}
+.works-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem}
+.works-title{font-family:'Unbounded',sans-serif;font-size:clamp(26px,5vw,56px);font-weight:900;line-height:1}
+.works-title span{color:var(--a2)}
+
+/* ── ACCORDION ── */
+.accordion{margin-bottom:2px}
+.accordion-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.2rem 0;cursor:none;
+  border-bottom:1px solid rgba(74,74,106,.35);
+  transition:border-color .3s;
+}
+.accordion-header:hover{border-color:var(--a2)}
+.accordion-header:hover .acc-title{color:var(--a2)}
+.acc-left{display:flex;align-items:center;gap:1.2rem}
+.acc-num{font-size:11px;letter-spacing:.3em;color:var(--muted)}
+.acc-title{font-family:'Unbounded',sans-serif;font-size:clamp(15px,2.2vw,26px);font-weight:700;transition:color .3s}
+.acc-count{font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.acc-arrow{
+  width:34px;height:34px;border:1px solid var(--muted);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:transform .4s cubic-bezier(.23,1,.32,1),border-color .3s,background .3s;
+}
+.accordion.open .acc-arrow{transform:rotate(180deg);border-color:var(--a2);background:var(--a2)}
+.accordion.open .acc-arrow svg{stroke:#060608}
+.accordion-body{max-height:0;overflow:hidden;transition:max-height .55s cubic-bezier(.23,1,.32,1)}
+.accordion.open .accordion-body{max-height:none;overflow:visible}
+.portfolio-meta{
+  display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
+  padding:.9rem 4px .2rem;
+  font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+}
+.portfolio-meta .meta-company{color:var(--a2)}
+
+
+/* ── PORTFOLIO MASONRY GRID ── */
+.carousel-wrap{position:relative;padding:.6rem 0 1rem}
+.carousel{
+  display:flex;
+  gap:6px;
+  padding:16px 4px;
+  width:100%;
+  align-items:flex-start;
+}
+.masonry-col{
+  flex:1 1 0;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.video-card{
+  width:100%;
+  min-width:0;
+  position:relative;overflow:hidden;
+  background:var(--surface);cursor:none;border-radius:3px;
+  transition:transform .35s cubic-bezier(.23,1,.32,1),box-shadow .35s;
+}
+.video-card:hover{transform:scale(1.08);z-index:10;box-shadow:0 16px 48px rgba(0,0,0,.8)}
+@media(max-width:1200px){
+  .carousel{gap:6px}
+}
+@media(max-width:800px){
+  .carousel{gap:5px}
+}
+@media(max-width:520px){
+  .carousel{gap:5px}
+}
+.video-card:hover .vc-overlay{opacity:1}
+.vc-thumb{width:100%;display:block;position:relative;overflow:hidden;background:var(--surface)}
+.vc-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(6,6,8,.9) 0%,transparent 60%);
+  display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;
+  padding:.7rem;opacity:0;transition:opacity .3s;z-index:2;
+}
+.vc-play{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:38px;height:38px;border:1.5px solid var(--a2);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.vc-play svg{margin-left:3px}
+.vc-tag{font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:var(--a2);margin-bottom:.2rem}
+.vc-name{font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;color:var(--text)}
+.car-btn{display:none;
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(13,13,18,.9);border:1px solid var(--muted);
+  color:var(--text);font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:none;z-index:5;transition:border-color .2s,background .2s,color .2s;
+}
+.car-btn:hover{border-color:var(--a2);background:var(--a2);color:#060608}
+.car-prev{left:-17px}.car-next{right:-17px}
+
+/* Lightbox - not used for Drive, kept for future YouTube */
+#lightbox{display:none}
+
+/* CONTACT */
+#contact{padding:6rem 6vw 4rem;text-align:center;position:relative;overflow:hidden}
+.contact-title{font-family:'Unbounded',sans-serif;font-size:clamp(36px,7vw,90px);font-weight:900;line-height:.95;margin-bottom:2rem}
+.contact-title .stroke{-webkit-text-stroke:1px rgba(255,255,255,.25);-webkit-text-fill-color:transparent}
+.contact-links{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;margin-top:2.5rem}
+.contact-link{padding:.8rem 2rem;font-size:12px;letter-spacing:.25em;text-transform:uppercase;text-decoration:none;color:var(--text);border:1px solid var(--muted);transition:border-color .3s,color .3s;cursor:none}
+.contact-link:hover{border-color:var(--a2);color:var(--a2)}
+footer{padding:2rem 6vw;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(74,74,106,.3);font-size:11px;color:var(--muted);letter-spacing:.15em;flex-wrap:wrap;gap:1rem}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <button id="lb-close">✕</button>
+  <iframe id="lb-iframe" allowfullscreen allow="autoplay"></iframe>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#hero">GLEB<span>.</span></a>
+  <div class="nav-links">
+    <a href="#about">О себе</a>
+    <a href="#ai-works">MY Works</a>
+    <a href="#skills">Навыки</a>
+    <a href="#contact">Контакт</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="grid-bg"></div>
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+  <div style="position:relative;z-index:2">
+    <p class="hero-label">Motion Designer / AI Video Creator · Minsk / Remote</p>
+    <h1 class="hero-name">
+      <span>GLEB</span>
+      <span class="outline">CHERNENKO</span>
+    </h1>
+    <p class="hero-role">
+      Создаю <em>рекламные креативы</em> на стыке<br>
+      классического моушн и <em>генеративного AI</em>
+    </p>
+    <div class="hero-badges">
+      <span class="hero-badge b1">Aiby · Marketing AI</span>
+      <span class="hero-badge b2">3+ лет опыта</span>
+      <span class="hero-badge b3">AI-POWERED PRODUCTION STACK</span>
+    </div>
+    <a href="#ai-folder-0" class="hero-cta">
+      <span>Смотреть работы</span><span>↓</span>
+    </a>
+  </div>
+  <div class="scroll-hint">SCROLL</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">Motion Design <span>✦</span></span>
+    <span class="marquee-item">AI Video Gen <span>✦</span></span>
+    <span class="marquee-item">Performance Ads <span>✦</span></span>
+    <span class="marquee-item">Kling · Runway · Sora <span>✦</span></span>
+    <span class="marquee-item">After Effects <span>✦</span></span>
+    <span class="marquee-item">Midjourney · Flux <span>✦</span></span>
+    <span class="marquee-item">ElevenLabs <span>✦</span></span>
+    <span class="marquee-item">n8n Automation <span>✦</span></span>
+    <span class="marquee-item">Motion Design <span>✦</span></span>
+    <span class="marquee-item">AI Video Gen <span>✦</span></span>
+    <span class="marquee-item">Performance Ads <span>✦</span></span>
+    <span class="marquee-item">Kling · Runway · Sora <span>✦</span></span>
+    <span class="marquee-item">After Effects <span>✦</span></span>
+    <span class="marquee-item">Midjourney · Flux <span>✦</span></span>
+    <span class="marquee-item">ElevenLabs <span>✦</span></span>
+    <span class="marquee-item">n8n Automation <span>✦</span></span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-left reveal">
+    <h2>AI Motion<br><span>Designer</span></h2>
+    <p class="about-text">
+      Motion Designer с 3+ годами коммерческого опыта в перформанс-маркетинге и рекламных креативах. Специализируюсь на гибридном видеопродакшене — объединяю классический моушн-дизайн в After Effects с генеративными нейросетями.<br><br>
+      Слежу за каждым релизом AI-инструментов, тестирую в день выхода и первым внедряю в продакшн. Сейчас работаю в <strong style="color:var(--a2)">Aiby</strong> — создаю высококонверсионные видеокреативы для международных AI-продуктов.
+    </p>
+    <div class="about-stats">
+      <div class="stat"><div class="stat-num">3+</div><div class="stat-label">лет опыта</div></div>
+      <div class="stat"><div class="stat-num">20+</div><div class="stat-label">AI tools in production</div></div>
+      <div class="stat"><div class="stat-num">100+</div><div class="stat-label">проектов</div></div>
+      <div class="stat"><div class="stat-num">∞</div><div class="stat-label">трендов в день</div></div>
+    </div>
+  </div>
+  <div class="about-right reveal" style="transition-delay:.15s">
+    <div class="ai-stack-block">
+      <div class="ai-stack-title">⚡ AI Production Stack</div>
+      <div class="ai-row">
+        <div class="ai-row-label">Видео генерация</div>
+        <div class="ai-row-tools">Kling · Veo · Omni · Flash · Grok · Seedance 2 · Runway Gen-3 · Pika · Luma · SYNTX AI</div>
+      </div>
+      <div class="ai-row">
+        <div class="ai-row-label">Изображения & Промпты</div>
+        <div class="ai-row-tools">Midjourney · Flux · GPT Image 2 · Nano Banana</div>
+      </div>
+      <div class="ai-row">
+        <div class="ai-row-label">Аудио & Войсовер</div>
+        <div class="ai-row-tools">ElevenLabs · Suno</div>
+      </div>
+      <div class="ai-row">
+        <div class="ai-row-label">Автоматизация</div>
+        <div class="ai-row-tools">n8n · кастомные AE скрипты · ExtendScript</div>
+      </div>
+      <div class="ai-row">
+        <div class="ai-row-label">Base AI Tech</div>
+        <div class="ai-row-tools">ComfyUI · Stable Diffusion · ControlNet · deepfake pipelines</div>
+      </div>
+      <div class="ai-row">
+        <div class="ai-row-label">LLM</div>
+        <div class="ai-row-tools">Claude · Gemini · ChatGPT</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MY WORKS -->
+<section id="ai-works">
+  <div class="works-header reveal">
+    <h2 class="works-title"><span>MY</span> Works</h2>
+    <p class="section-label" style="margin-bottom:0">— Портфолио</p>
+  </div>
+
+  <div id="accordions"></div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <p class="section-label reveal">— Что я умею</p>
+  <div class="skills-grid">
+    <div class="skill-card reveal" style="transition-delay:.05s">
+      <div class="skill-accent" style="background:var(--a2)"></div>
+      <div class="skill-num">01</div>
+      <div class="skill-title">AI Video<br>Production</div>
+      <div class="skill-desc">Kling · Runway · Sora · Pika · Luma. Полный цикл от промпта до финального ролика с пост-обработкой в After Effects.</div>
+    </div>
+    <div class="skill-card reveal" style="transition-delay:.1s">
+      <div class="skill-accent" style="background:var(--a1)"></div>
+      <div class="skill-num">02</div>
+      <div class="skill-title">Motion<br>Design</div>
+      <div class="skill-desc">After Effects (кастомные скрипты, ExtendScript), Premiere Pro. Кеинг, трекинг, композитинг, цветокоррекция.</div>
+    </div>
+    <div class="skill-card reveal" style="transition-delay:.15s">
+      <div class="skill-accent" style="background:var(--a3)"></div>
+      <div class="skill-num">03</div>
+      <div class="skill-title">Performance<br>Ads</div>
+      <div class="skill-desc">Высококонверсионные креативы для Meta Ads, TikTok. A/B-тестирование, быстрые итерации под требования медиабайинга.</div>
+    </div>
+    <div class="skill-card reveal" style="transition-delay:.2s">
+      <div class="skill-accent" style="background:#ff7a00"></div>
+      <div class="skill-num">04</div>
+      <div class="skill-title">Pipeline<br>Automation</div>
+      <div class="skill-desc">n8n, кастомные AE скрипты. Оптимизация рутинных процессов, ускорение сборки креативов и вариаций.</div>
+    </div>
+    <div class="skill-card reveal" style="transition-delay:.25s">
+      <div class="skill-accent" style="background:#0099ff"></div>
+      <div class="skill-num">05</div>
+      <div class="skill-title">Brand<br>Visual</div>
+      <div class="skill-desc">Лого-анимации, моушн-айдентика, баннеры, GIF. Адаптация форматов под любые платформы и ГЕО.</div>
+    </div>
+    <div class="skill-card reveal" style="transition-delay:.3s">
+      <div class="skill-accent" style="background:var(--a2)"></div>
+      <div class="skill-num">06</div>
+      <div class="skill-title">AI Image<br>& Prompting</div>
+      <div class="skill-desc">Midjourney · Flux · ComfyUI · SD · ControlNet. Character consistency, deepfake pipelines, пэкшоты.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="orb" style="width:400px;height:400px;background:rgba(162,89,255,.1);top:50%;left:50%;transform:translate(-50%,-50%);filter:blur(100px)"></div>
+  <div style="position:relative;z-index:2">
+    <p class="section-label reveal">— Давай работать</p>
+    <h2 class="contact-title reveal">
+      <span>Есть </span><span class="stroke">проект?</span><br>
+      <span class="stroke">Пиши</span><span> мне.</span>
+    </h2>
+    <div class="contact-links reveal">
+      <a href="mailto:glebchernenko94@gmail.com" class="contact-link">Email</a>
+      <a href="https://t.me/gknyaz" class="contact-link">Telegram</a>
+      <a href="https://linkedin.com/in/gknyaz" class="contact-link">LinkedIn</a>
+      <a href="https://goo.su/Ho71jP" class="contact-link">Portfolio Drive</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Gleb Chernenko</span>
+  <span>Motion · AI · Visual</span>
+  <span>@gknyaz</span>
+</footer>
+
+<script>
+// ══════════════════════════════════════════════
+// ПОРТФОЛИО — добавляй новые секции сюда
+// Формат: { title, tag, videos: [{id, pb}] }
+// pb = padding-bottom для пропорции: '56%'=16:9, '100%'=1:1, '177%'=9:16
+// ══════════════════════════════════════════════
+const SECTIONS = [
+  {
+  title: '01 · SHOWREEL & BEST WORKS',
+  tag:   'Showreel',
+  videos: [
+    {id:'14LiQ4lWudS3ZY019yLZRWuSPn9pKurDP', pb:'56%'},
+    {id:'18dUCj3AQgE6bDFo2hJCmx1h6WxbxnHTt', pb:'177%'},
+    {id:'1E5vdV_EJEysuaEo9Xx91kihG1o6To8_c',  pb:'177%'},
+    {id:'1MLftfVUF5H1oKQbFvPmyYB0G0wN07aVT',  pb:'56%'},
+    {id:'1YXcBbBg1oshoW_RmFFs6V_teNCGoDTmn',  pb:'177%'},
+    {id:'1VhZRISG4KQ7QdfN9Un7YFxrgieF45sFg',  pb:'100%'},
+    {id:'1dIpV9sShLWSvtrk62nHMlswoqbTP7dKF',  pb:'177%'},
+    {id:'1smhqB4RSaHt_iNT179sYfv415lq-mjyx',  pb:'177%'},
+    {id:'1xvgX3UF4yik59F7k5BZjAT7RpT7h3N_Q',  pb:'177%'},
+    {id:'1xBfPtTaUIylmjS06VbNYCWeFtBfywusR',  pb:'177%'},
+    {id:'1TAR-99Sb11ZwUe1UyjTElWGytbIwIxU_',  pb:'177%'},
+    {id:'1q38POwvwcJ6D42fMHBC-1OhnakDTc1Lf',  pb:'56%'},
+    {id:'1EO9yhkHfJPSWPuEP-CCHLMoQepPtNWkX',  pb:'177%'},
+    {id:'1UvgwDkeAsi2xw2ADPzFvEgGltoWg68vN',  pb:'177%'},
+    {id:'1huLGCsnUKYw-eZpZXMjnCCpZXZV35bOi',  pb:'56%'},
+    {id:'1oe2x6GeZbqs1mvo-LDh4-t2os0cKcp72',  pb:'56%'},
+    {id:'1gvP3qOEYD25FG43lFPdFpKodJNjDolgz',  pb:'56%'},
+    {id:'1ac79eY1wziJcWL9JtayLDMWq5q8DiJ-a',  pb:'177%'},
+    {id:'1gbSuLzz6lLaElX2-uJ4auNcCYhd2Ep5Q',  pb:'177%'},
+    {id:'1vFcN5ExhleGSN_a2fqMovjdEW6bY-0BB',  pb:'177%'},
+  ]
+},
+  {
+    title: '02 · AI GENERATIVE & MOTION VIDEO',
+    tag:   'AI Video · Generative · Motion Graphics',
+    videos: [
+      { id: '1Up9mYxI0zBZsq1qat6L_mqF5SHpNui7E', pb: '177.78%' },
+  { id: '15lXa0d0HQ9CSaDL1LdfN9M1NV16_tczQ', pb: '177.78%' },
+  { id: '1t1andWY46cemmo92lERg3uMjAN4YAK_W', pb: '177.78%' },
+  { id: '1G4KfRBxER73bR_2x9hegHr46N3ghvA5q', pb: '56%' },
+  { id: '1vFzA9_mlW-e0fojzg6Xp5fHbBXJsxcfa', pb: '100%' },
+  { id: '1nnwl3nxy6xGtiMw0fi4gTM4UKXBSl_Fv', pb: '100%' },
+  { id: '1yzNmaVGsV-WhUIApGgU2IDbCaRMysmHT', pb: '177%' },
+  { id: '1dZjUQI3crEOQUJj0hvVAJ2qQsGLD-n1A', pb: '100%' },
+  { id: '1asdczp_GWCamDKwCoacWUmTQEKeqzbtD', pb: '100%' },
+  { id: '1be440mc3Rp7r3h4tVj9jejavewhT2CQr', pb: '100%' },
+  { id: '1OcJB-FjTXpf-YeP7VJ4Ng4TpifZ5n85g', pb: '100%' },
+  { id: '1tkpXm7jepdzIm04C0WWaLqo9ENs1pNED', pb: '100%' },
+  { id: '1I9sAjFT0IhVfQ3Vm1LkFv6txsYRKaYhc', pb: '100%' },
+  { id: '1Dy57f94jIZGHPkUSGWQO3UyA218KripY', pb: '177%' },
+  { id: '1By0l7CEVRHApcSfzaQW6mMnA3izIB6FM', pb: '177%' },
+  { id: '1SJ-HeCH4XTHcUlEanIotk0NQdDAxzmOZ', pb: '56%' },
+  { id: '1Sc1PhkPzn_7nd_lAv3SJ5wxfBSwdZqNO', pb: '56%' },
+  { id: '1Br8V5IcelirnfudCUJHNWw33IkB8bdoy', pb: '177%' },
+  { id: '1hb-STtGuDB7ziyWqGHssUKlYvO9W2LIa', pb: '177%' },
+  { id: '1HDGaQ3JQvMtvF5dlmobuR4yIakDNrJfU', pb: '177%' },
+  { id: '1wUpeSlnhqwG9b9vSoOBK6rlclney6uu2', pb: '177%' },
+  { id: '1gD7Lg4bHE5TASBdl2gH0KdQveA_Uv6pG', pb: '177%' },
+  { id: '14XGlFb46xPfnj8cOqRdVCB9mwIYGgL_G', pb: '177%' },
+  { id: '1IVdFv2iMdRqOHPO_jnzgL2V1_v-qRCXZ', pb: '177%' },
+  { id: '15MLWJ2HILraRrqufCsUgm184ZLpwlsEt', pb: '177%' },
+  { id: '1l13yvIh7qIuD0ECACmPV2_jY-GYqljwT', pb: '177%' },
+  { id: '1zHq-JmwYq9cRk_ZdZEw9OU-6HfVmVZ9f', pb: '177%' },
+  { id: '1kgFqke1ekiYNNay1162zIJiU8xu1twao', pb: '177%' },
+  { id: '1rr9ugXiFUuQJ11cWRXj0IesK2eHBf9P4', pb: '100%' },
+  { id: '1kGEcun3BGc6aMUhXI668rOKt-MlyRlUz', pb: '56%' },
+  { id: '1owJ8eenLYfWbgqeew09M8ueeZu8zj63U', pb: '56%' },
+  { id: '1jCM92xV4FRQfvYzoTsrrehMcPBcIVe-W', pb: '56%' },
+  { id: '1_v8IYXmyZgB_iShib9hu4St8vVH99lY8', pb: '56%' },
+  { id: '1-KizujptdQBzgXgtqQ7jdGzGUdY1CDde', pb: '56%' },
+  { id: '1ic-DLX6BebSRvKFXMhXwEqJfgSZiVdEE', pb: '177%' },
+  { id: '1XAQC7i6nJ9b5OWbFrJRJJaT13YyU0e-n', pb: '177%' },
+  { id: '1e4JbhIk8CTwtBAg-_jPJLz6686CMQKZT', pb: '177%' },
+  { id: '1SzLWdyCM-K1nQ79BN-pFAv-jCleVTJDy', pb: '177%' },
+  { id: '1lahmkwwuk0kBrQOAcHLzHb8UmspkQD0w', pb: '177%' },
+  { id: '1X6-KeU6-qmBoeI9lx_vv6yyg6diarvFn', pb: '177%' },
+  { id: '12_Yi3CmNC43lGPM_dVplRdix61bQcScE', pb: '177%' },
+  { id: '1McMKx3c-756_PfIm2_2NHuUioxbIi7IS', pb: '100%' },
+  { id: '1VNhMaGN3aP1Ji_pXp9hJBSDOZkOCFn3Z', pb: '177%' },
+  { id: '1D7x1iBmExcIj1PeKwffzOVLyeinftA63', pb: '177%' },
+  { id: '1Qm_5K6Lvcz2hp5yzSVMkHR5qO9kz3-Tu', pb: '177%' },
+  { id: '1zoAnEleNOck6vHTo9PhQ1fvJnsYBexgN', pb: '177%' },
+  { id: '1sUJtfFDB_ASKWIZ-iLUsYlbJwQE9Sbk9', pb: '177%' },
+  { id: '1QtSYL6BJU4ndG6DZLW6TFeH2WShvNmTs', pb: '177%' },
+  { id: '1udcMPJGcxnNbnvZkgn-nbihBTloW9aQi', pb: '56%' },
+  { id: '1-c7p6Mygkd6mZWqTPP7-0qssFf3NCx_4', pb: '177%' },
+  { id: '1tU14oyhEBBdVdGaDmOrpaPy-IvIzjnnR', pb: '177%' },
+  { id: '1_L1xTRKVA5uQ2Pj96redBqe62DKqTJQn', pb: '177%' },
+  { id: '1SSNvd1tjNpczC6EmjTcd2E0xLOzMWQbK', pb: '177%' },
+  { id: '1rdOUPT9uLc_V_5uyzk_voRiHIeIQc2OH', pb: '100%' },
+  { id: '1Vy5_vSjmGoSp72po0MS1aVz3gGmyZxjQ', pb: '177%' },
+  { id: '1-_hFoWF7gPA9mJ_EsNZOEEG4tx1ok9Sy', pb: '177%' },
+  { id: '1jqHhDN2Gc7dErkyfqcHSdqpGV77MUvY9', pb: '177%' },
+  { id: '1dK3x_kOFS2_71xAnkllqtyKVyn5Ct32b', pb: '177%' },
+  { id: '1fThwmNwyZxuD4JR8E0HUaVh1MCowf0hu', pb: '177%' },
+  { id: '1NHvUZMxibsOeijd4rcs0f2nmKRP2mLS2', pb: '56%' },
+  { id: '1lzxDcUWR21a9pY6fTvPEsxxAvAzk7JuG', pb: '56%' },
+  { id: '14Z72JKWEfGuLkGV6Lr2TFF6878lKfaUQ', pb: '100%' },
+  { id: '1SPHU-2RAlCeHk7BeOgB-Vhy6euo7NdEg', pb: '177%' },
+  { id: '15qhyC7-hxDHecUIkzy-k0_5eSTJGX754', pb: '177%' },
+  { id: '1A6TuAnjLzclL3Lw45BKL28zA4VT-US64', pb: '177%' },
+  { id: '1jRXzYkJzl0YHUA0chJocHtHqcudixNmD', pb: '177%' },
+  { id: '1NqFgh8zPfqqKhZAsoYkTBCclstg769Nz', pb: '177%' },
+  { id: '1tafMm7TpCgUfuGeMhUDJ6E1ON_0pE2YY', pb: '177%' },
+  { id: '1pOdsPsTAMHHl5aLT4j38BQ5P3qdnIdbe', pb: '177%' },
+  { id: '1ZTiuQI5f-UxLnSt7sawk8LsNnRG_QEVo', pb: '177%' },
+  { id: '1_IE86tiy4aDzg8M7q9Fq13h25Kb66Ts7', pb: '177%' },
+  { id: '11YS-WyntaR7aX1zuwTCww6pDUi5EgvGB', pb: '100%' },
+  { id: '1dpVlrB5vBd1W69v4Z4jnPdGxQey2BJIp', pb: '100%' },
+  { id: '1WG9GdNr6AdLruqj6PDmZuIjoQzYG106m', pb: '177%' },
+  { id: '10YcAQ7hz6GrVQzZIByVgbNPI_g-vdHX9', pb: '177%' },
+  { id: '1bObmLsfjabwhvPKp0X-qztSXNUaq6NNG', pb: '177%' },
+  { id: '1gaHIXNBK8EZ0dRfEvPGZPNlBs76R4lRL', pb: '56%' },
+  { id: '1jCsVPjUxEaKpzsaHDTbdi59idvvm3DsT', pb: '177%' },
+  { id: '1AaAXeC3tkPka4CWc7N9xm0Zp2AyOGZf_', pb: '56%' },
+  { id: '1o_tVUirV8PkxyF5PzodVgbEYB-wPUJc9', pb: '177%' },
+  { id: '168hqdLZB3sLB6XOqDjAW8bVl2vrrbRYL', pb: '177%' },
+  { id: '1F7btvagRIBjHfx_VBoN9oEtd6Zkv8W0D', pb: '177%' },
+  { id: '1UN-hdqleBbsFAcIf8gRvr9N7zYTSiV1S', pb: '56%' },
+  { id: '1E8KwYPfiRejP8OQBCtqf8bCN7YgHFG7Y', pb: '100%' },
+  { id: '1223A6G7Fue4rTNz984oR0Ft_jJe5Zzgl', pb: '100%' },
+  { id: '1NnLU3vWpCDT2cuye9Q256sdQU83hZydK', pb: '56%' },
+  { id: '1dk11cUlAI0tVh8pIh5YioiF7XRCdlNG2', pb: '177%' },
+  { id: '1dPi3R6b7iySv0hOJmwisc9HuTdfkIXXG', pb: '177%' },
+  { id: '19ph1IFLGixb1aZz_j6v0zN7hQuMgoQE_', pb: '100%' },
+  { id: '1e0IHrfQf4nDISCyxyfx87RKtB3SU7Mxi', pb: '177%' },
+  { id: '1vT9x0M_L97aiTVPy-OFOGTTw3vNwG7Lg', pb: '177%' },
+  { id: '1x4lFuwi1_e2ZbdLAe2ilWJziYOBKfdQ5', pb: '56%' },
+  { id: '1q70h6b-sFelfmWVI3f_H-WuJ9tisGga4', pb: '177%' },
+  { id: '1BZh_3cmCGzuB3CVwqHfRefJ_h9onPgV8', pb: '177%' },
+  { id: '1JFrsl1neyuSLpl9WItjN2iPOVLLSQwT1', pb: '177%' },
+  { id: '1-ltvmyabOBtJ3Uw1laexK3-uFSRo72IF', pb: '177%' },
+  { id: '1kiRWe0J38COAqLLmJw5eZxNEVmw94-X1', pb: '100%' },
+  { id: '1hEIIorz4f8P9CLIazuXhvYw27TVUalcX', pb: '177%' },
+  { id: '1drkiDQQFCuajxP8RC1kJ0obyJrrGE0NP', pb: '177%' },
+  { id: '1p44UewZ3gI7W2m348iKYudLpq3nlSg2a', pb: '177%' },
+  { id: '1Oa3SjSO3tcoQQqpcGq6gej5_XcUEnOwm', pb: '177%' },
+  { id: '1vU09d7qtGwK90f0tnuE7p6j_IArigwJg', pb: '177%' },
+  { id: '1HHjGrh8aCbwjdX-Pyl86AaMJE7EgEfDi', pb: '177%' },
+  { id: '1UONgmYCnDVoabfhQQoMMorHlp_Ujt2C0', pb: '177%' },
+  { id: '1Db9P8fEVv8AMlAGhI5dxUsYPg8r3jYKO', pb: '56%' },
+  { id: '14Nx3LIkFCSAHLaCh1Di56wLL5Sa9rxIo', pb: '177%' },
+  { id: '1JLefgtUhpBt-wuheN3oTTC4U1XtWqyzC', pb: '177%' },
+  { id: '1OpP6JROdrnMhKBpcYPw47R42BBtG-Lx2', pb: '177%' },
+  { id: '1BurTnfVL-ni4MTlxpqx-fDVXTnKI4-ZC', pb: '177%' },
+  { id: '12TIqCxy6HRuPIuF_5L98O1fP-D_GlMla', pb: '200%' },
+  { id: '10esmowt371v5viuEOi63mGKs4Of9AsQ4', pb: '100%' },
+  { id: '18c5oZRoBI2VMHfW6zdYBwlBfmqDoRGls', pb: '177%' },
+  { id: '1ze8NHfbapj1Hp3mXKr7_LgxL8Bny--sZ', pb: '177%' },
+  { id: '1ygg6D4fm5q8V-yk3EyYeehPxQKhwsnZL', pb: '177%' },
+  { id: '1mDVY-zyQKPnJ39pBEnzMVc07l42-Bla4', pb: '177%' },
+  { id: '1NangmHuIIa4X1bEOrY23m1FIHVHWXubM', pb: '100%' },
+  { id: '1CH6L_zGcG1RPMKU8PiRH8A54cGDIJFcb', pb: '177%' },
+  { id: '1fNOnmcMzhSyX0dQA_5OziwlqVTr3vmKK', pb: '100%' },
+  { id: '1UUkf3hjuTB7EiNPioass0VTnhy3GZue6', pb: '177%' },
+  { id: '1vBV75wQ55pHS9Kr0tA61eatmMnQ1V9Lk', pb: '177%' },
+  { id: '1d8gMknj0kI1Jr18xV_mgCcSivzTdKC4t', pb: '177%' },
+  { id: '1E8Yn04jgf6Lnh5jvVkiRK-RBDjwjIWrf', pb: '100%' },
+  { id: '15uyBhbuPB8W_lI1pvgzESsGsqUWD_qi4', pb: '100%' },
+  { id: '1NSXJDWTxQ7oWRCL4w-J7Nuerogvh_LE9', pb: '177%' },
+  { id: '10wp4PuVo_M7cNWbj_UpyDoAcp9IBWYOE', pb: '177%' },
+  { id: '1v-jmI7a0tWXEcIrnTxmcS-Qo2GkI8XPZ', pb: '177%' },
+  { id: '1Rb2SVMTrLhCoA5bwTsjhg8nXKGAIE5fx', pb: '100%' },
+  { id: '11uxATaeDB-tFP0tv4F9RlqdmBEuf1CYs', pb: '177%' },
+  { id: '16GMiVniJJE-21aWdkaG_1wGd2gS5kjlo', pb: '100%' },
+  { id: '1DZyy6XNR2anK-dQUW_aSloH_nziEYr9P', pb: '177%' },
+  { id: '1u74VXTVAW9HkP7VUpDQFCgS3nRI4yzie', pb: '177%' },
+  { id: '14jmcB7RL0iqfptQvQ0BlEZy987E7yQyE', pb: '177%' },
+  { id: '1kZWqasbppJLtXlCd3BBIU4FuRbheiC4f', pb: '177%' },
+  { id: '1lzRp37LW_7GqXUoPVamTrAPjyC4gG3FX', pb: '56%' },
+  { id: '16MvTIaxs6s-_MmQy3OvNG1Q1uBTBiFLX', pb: '177%' },
+  { id: '173WjfZf9rOZQiar6Z8K74fXmxhdJvSyN', pb: '177%' },
+  { id: '1vf9g43O-mqitJQ8-7aI3LsfVpIPj6eYR', pb: '177%' },
+  { id: '1oGNB7UutFC8HDk0rxW3MgQ93tgQjwJPO', pb: '177%' },
+  { id: '1HkWWUjekv8Fwl_P4vjjqXa2IwINBML5A', pb: '177%' },
+  { id: '16Qo8Fc4tBUZ4yI1KOdnkSJIr5Qr9fvEl', pb: '177%' },
+  { id: '1YKab4am_3H0G6zmOklW0uj-EZPmnWM3M', pb: '177%' },
+  { id: '1UyuQ52hz6m-Hy6QXAXrpDvKi2wB2diSP', pb: '177%' },
+  { id: '1_GGbp8mbH4ZEvg3y3e0b8FqGyDeXJJLg', pb: '177%' },
+  { id: '1rN-mcDDN_3uFDq6vX52vsO8Ua7adjT0M', pb: '177%' },
+  { id: '15SG8qe8Mz3vT2B06C5gbBnKtquRPNWVD', pb: '177%' },
+  { id: '1l3CbBU-vBAcsaLEKtiOXloD7YF5odffj', pb: '177%' },
+  { id: '1FRSTE4-Hsnng1uFTPBKL39FQVRIDbnVo', pb: '56%' },
+  { id: '1wfLywV5XxrtL9NC37iR0wmniP42MShvc', pb: '56%' },
+  { id: '1TBdVLsO88hFSX0imdcDSWHhTUhbx_pMm', pb: '177%' },
+  { id: '1s2VNNB-63qXESEWU_2zSjvJ6x6QeWSqf', pb: '177%' },
+  { id: '1BGmC5GfzdvuPfpizCT9HK_egusp_Baue', pb: '177%' },
+  { id: '1uzpk7pWILG3NFU2m3TVrWFH-HkcoZFRu', pb: '177%' },
+  { id: '1icEu2DPymmq2nbQj8x4_molmZio1wP9n', pb: '177%' },
+  { id: '1ul3lakl38dnO1Qgb1thg81gz6s_FlEuv', pb: '177%' },
+  { id: '1W3wYmp2Hezb4C6uIXHN9tSQCxBdZnBwf', pb: '177%' },
+  { id: '1Z1en_8CwiVq9ZxcY_y8W-6LgoMnnlGto', pb: '177%' },
+  { id: '1AAZ8Czd_ccYItoFCVKg05qZg0hSpDZgx', pb: '177%' },
+  { id: '1m5znZoolULVCTZ5mbz91Y1R_3dB0OUdf', pb: '100%' },
+  { id: '1zyEGTv-OmUjt1B6Z0yDGgvo0z87SEM-s', pb: '177%' },
+  { id: '106FPh6rlwUtuWWJV9W3AL-GbUD0gQLl8', pb: '100%' },
+  { id: '1n3BjA1VlOUQiEEzGpyjFg26lMZtnA13C', pb: '177%' },
+  { id: '1TJw33wxZyn1iuyv0zDWx_tgN4BquZgWs', pb: '177%' },
+  { id: '1xpJW72rW4--a4z6MI5oI9XIjmVi2jDBR', pb: '177%' },
+  { id: '1kfsx84sigF6rW_m6753Ejyo2XD_uGSsx', pb: '177%' },
+  { id: '17zvWYhb9tL9imE1qBN2iriaeAJplwAn6', pb: '56%' },
+    ]
+  }
+];
+
+const GRADS = [
+  'linear-gradient(135deg,#1a0818,#ff3c5a22,#060608)',
+  'linear-gradient(135deg,#00101a,#00f5c822,#060608)',
+  'linear-gradient(135deg,#0d0020,#a259ff22,#060608)',
+  'linear-gradient(135deg,#1a0a00,#ff7a0022,#060608)',
+  'linear-gradient(135deg,#00101a,#0066ff22,#060608)',
+];
+const PLAY = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polygon points="3,1 15,8 3,15" fill="#00f5c8"/></svg>`;
+
+function buildCard(v, i, tag) {
+  const url   = `https://drive.google.com/file/d/${v.id}/view`;
+  const thumb = `https://drive.google.com/thumbnail?id=${v.id}&sz=w600`;
+  const grad  = GRADS[i % GRADS.length];
+  const card  = document.createElement('div');
+  card.className = 'video-card';
+  card.innerHTML = `
+    <div class="vc-thumb" style="padding-bottom:${v.pb}">
+      <img src="${thumb}" alt="${tag} ${i+1}"
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"
+        onerror="this.style.display='none';this.parentElement.style.background='${grad}'">
+    </div>
+    <div class="vc-overlay">
+      <div class="vc-play">${PLAY}</div>
+      <div class="vc-tag">${tag}</div>
+      <div class="vc-name">${String(i+1).padStart(2,'0')}</div>
+    </div>`;
+  card.addEventListener('click', () => window.open(url, '_blank'));
+  return card;
+}
+
+function getMasonryColumnCount() {
+  if (window.innerWidth <= 520) return 2;
+  if (window.innerWidth <= 800) return 4;
+  if (window.innerWidth <= 1200) return 6;
+  return 9;
+}
+
+function buildMasonry(videos, tag, carousel) {
+  carousel.innerHTML = '';
+
+  const count = getMasonryColumnCount();
+  const columns = Array.from({length: count}, () => {
+    const col = document.createElement('div');
+    col.className = 'masonry-col';
+    carousel.appendChild(col);
+    return col;
+  });
+
+  // Put every next creative into the currently shortest column.
+  // This keeps mixed 16:9 / 1:1 / 9:16 cards compact with no large empty row gaps.
+  const heights = new Array(count).fill(0);
+
+  videos.forEach((v, i) => {
+    const card = buildCard(v, i, tag);
+
+    let target = 0;
+    for (let c = 1; c < count; c++) {
+      if (heights[c] < heights[target]) target = c;
+    }
+
+    columns[target].appendChild(card);
+
+    const widthRatio = 1 / count;
+    const paddingRatio = parseFloat(v.pb) / 100;
+    heights[target] += widthRatio * paddingRatio + 0.006;
+  });
+}
+
+function buildSection(sec, idx) {
+  const acc = document.createElement('div');
+  acc.className = 'accordion' + (idx === 0 ? ' open' : '');
+  acc.id = `ai-folder-${idx}`;
+
+  const carId = `car-${idx}`;
+  const carousel = document.createElement('div');
+  carousel.className = 'carousel';
+  carousel.id = carId;
+
+  buildMasonry(sec.videos, sec.tag, carousel);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'carousel-wrap';
+
+  const body = document.createElement('div');
+  body.className = 'accordion-body';
+
+  const meta = document.createElement('div');
+  meta.className = 'portfolio-meta';
+  meta.innerHTML = '<span class="meta-company">' + sec.title.toUpperCase() + '</span><span>ROLE: MOTION DESIGNER / AI VIDEO CREATOR</span>';
+
+  body.appendChild(meta);
+  wrap.appendChild(carousel);
+  body.appendChild(wrap);
+
+  const header = document.createElement('div');
+  header.className = 'accordion-header';
+  header.innerHTML = `
+    <div class="acc-left">
+      <span class="acc-num">${String(idx+1).padStart(2,'0')}</span>
+      <span class="acc-title">${sec.title}</span>
+      <span class="acc-count">${sec.videos.length} videos</span>
+    </div>
+    <div class="acc-arrow">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M2 4.5L7 9.5L12 4.5" stroke="#f0eeff" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>`;
+
+  header.addEventListener('click', () => {
+    const isOpen = acc.classList.contains('open');
+    document.querySelectorAll('.accordion').forEach(a => a.classList.remove('open'));
+    if (!isOpen) acc.classList.add('open');
+  });
+
+  acc.append(header, body);
+  return acc;
+}
+
+// Rebuild the masonry layout when the viewport crosses a responsive breakpoint.
+let lastMasonryColumns = getMasonryColumnCount();
+window.addEventListener('resize', () => {
+  const next = getMasonryColumnCount();
+  if (next === lastMasonryColumns) return;
+  lastMasonryColumns = next;
+
+  SECTIONS.forEach((sec, idx) => {
+    const carousel = document.getElementById(`car-${idx}`);
+    if (carousel) buildMasonry(sec.videos, sec.tag, carousel);
+  });
+});
+
+const container = document.getElementById('accordions');
+SECTIONS.forEach((sec, i) => container.appendChild(buildSection(sec, i)));
+
+// ── CURSOR ──
+const cursor = document.getElementById('cursor'), ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => {
+  mx=e.clientX; my=e.clientY;
+  cursor.style.left=mx-6+'px'; cursor.style.top=my-6+'px';
+});
+(function animRing(){
+  rx+=(mx-rx-20)*.12; ry+=(my-ry-20)*.12;
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+})();
+document.addEventListener('mouseover', e => {
+  if(e.target.closest('a,.skill-card,.video-card,.accordion-header,.car-btn')){
+    cursor.style.transform='scale(2.2)'; ring.style.opacity='.15';
+  }
+});
+document.addEventListener('mouseout', e => {
+  if(e.target.closest('a,.skill-card,.video-card,.accordion-header,.car-btn')){
+    cursor.style.transform='scale(1)'; ring.style.opacity='.5';
+  }
+});
+
+// ── SCROLL REVEAL ──
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(r=>obs.observe(r));
+</script>
+</body>
+</html>
