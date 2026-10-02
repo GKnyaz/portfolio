@@ -219,6 +219,21 @@ nav.shrunk{padding:.42rem 1.1rem .42rem 1.4rem;background:linear-gradient(152deg
 /* ═══ HERO ═══ */
 #hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:9rem 6vw 5rem;overflow:hidden}
 .hero-inner{position:relative;z-index:3;max-width:1250px}
+/* Original VP9 WebM is kept intact: it contains the real alpha channel. */
+.hero-avatar{
+  position:absolute;z-index:2;top:50%;right:2vw;transform:translateY(-50%);
+  height:88vh;max-height:1000px;pointer-events:none;
+}
+.hero-avatar video{height:100%;width:auto;display:block;background:transparent}
+@media(max-width:1100px){
+  .hero-avatar{right:-10vw;height:76vh}
+}
+@media(max-width:880px){
+  .hero-avatar{right:-14vw;height:66vh;top:56%}
+}
+@media(max-width:640px){
+  .hero-avatar{right:-20vw;top:auto;bottom:1.2rem;transform:none;height:40vh}
+}
 .hero-label{font-size:clamp(10px,1.1vw,12.5px);letter-spacing:.3em;color:var(--a2);text-transform:uppercase;margin-bottom:1.7rem;display:flex;align-items:center;gap:.7rem}
 .hero-label::before{content:'';width:30px;height:1px;background:linear-gradient(90deg,var(--a2),transparent);display:inline-block}
 .hero-name{font-family:'Unbounded',sans-serif;font-weight:900;line-height:.9;letter-spacing:-.035em;font-size:clamp(44px,10.2vw,130px)}
@@ -536,6 +551,11 @@ footer a:hover{color:var(--a2)}
     <a href="#ai-folder-0" class="hero-cta">
       <span data-i18n="hero.cta">View works</span><span class="arw">↓</span>
     </a>
+  </div>
+  <div class="hero-avatar" aria-hidden="true">
+    <video autoplay muted loop playsinline preload="auto">
+      <source src="ava.webm" type="video/webm">
+    </video>
   </div>
   <div class="scroll-hint">SCROLL</div>
 </section>
