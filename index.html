@@ -224,7 +224,7 @@ nav.shrunk{padding:.42rem 1.1rem .42rem 1.4rem;background:linear-gradient(152deg
   position:absolute;z-index:2;top:50%;right:2vw;transform:translateY(-50%);
   height:88vh;max-height:1000px;pointer-events:none;
 }
-.hero-avatar video{height:100%;width:auto;display:block;background:transparent}
+.hero-avatar video{height:100%;width:auto;display:block;background:transparent;border:0;outline:0;box-shadow:none}
 @media(max-width:1100px){
   .hero-avatar{right:-10vw;height:76vh}
 }
@@ -232,7 +232,17 @@ nav.shrunk{padding:.42rem 1.1rem .42rem 1.4rem;background:linear-gradient(152deg
   .hero-avatar{right:-14vw;height:66vh;top:56%}
 }
 @media(max-width:640px){
-  .hero-avatar{right:-20vw;top:auto;bottom:1.2rem;transform:none;height:40vh}
+  /* No fixed-width clipping container: the transparent clip may extend left.
+     The hero itself clips only content outside of the page edge. */
+  .hero-avatar{
+    top:auto;right:-1vw;bottom:6.85rem;transform:none;
+    width:auto;height:18.5rem;max-height:36svh;
+    overflow:visible;
+  }
+  .hero-avatar video{width:auto;height:100%;max-width:none}
+  .hero-inner,.hero-label,.hero-name,.hero-role,.hero-badges,.hero-cta,.scroll-hint{
+    position:relative;z-index:4;
+  }
 }
 .hero-label{font-size:clamp(10px,1.1vw,12.5px);letter-spacing:.3em;color:var(--a2);text-transform:uppercase;margin-bottom:1.7rem;display:flex;align-items:center;gap:.7rem}
 .hero-label::before{content:'';width:30px;height:1px;background:linear-gradient(90deg,var(--a2),transparent);display:inline-block}
