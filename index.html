@@ -201,6 +201,110 @@ nav.shrunk{padding:.42rem 1.1rem .42rem 1.4rem;background:linear-gradient(152deg
 .nav-links a:hover::after{width:100%}
 @media(max-width:880px){.nav-links{display:none}}
 
+/* CTA BRIDGE CARD IN GALLERY */
+.cta-bridge-card{
+  min-height:220px;
+  background:linear-gradient(135deg,rgba(255,60,90,.12),rgba(162,89,255,.12),rgba(0,245,200,.08)) !important;
+  border:1px dashed rgba(255,255,255,.28) !important;
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:transform .3s,border-color .3s,box-shadow .3s;
+}
+.cta-bridge-card:hover{
+  transform:translateY(-4px) scale(1.02);
+  border-color:var(--a2) !important;
+  box-shadow:0 12px 30px rgba(0,245,200,.2);
+}
+.bridge-card-inner{
+  padding:1.4rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.6rem;
+}
+.bridge-tag{
+  font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:var(--a2);text-transform:uppercase;
+}
+.bridge-title{
+  font-family:'Unbounded',sans-serif;font-size:12.5px;font-weight:700;line-height:1.4;color:#fff;
+}
+.bridge-action{
+  margin-top:.4rem;padding:.4rem 1rem;border-radius:999px;
+  background:linear-gradient(120deg,#ff3c5a,#e0409a,#a259ff);
+  font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;
+  box-shadow:0 4px 14px rgba(255,60,90,.35);
+}
+
+/* VIDEO LIGHTBOX MODAL */
+.video-lightbox-modal{
+  position:fixed;inset:0;z-index:999998;
+  display:none;align-items:center;justify-content:center;
+  padding:1.5rem;background:rgba(6,6,8,.88);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  opacity:0;transition:opacity .3s ease;
+}
+.video-lightbox-modal.open{
+  display:flex;opacity:1;
+}
+.vl-container{
+  position:relative;width:100%;max-width:880px;
+  background:linear-gradient(150deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:24px;overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.85),0 0 50px rgba(0,245,200,.12);
+  display:flex;flex-direction:column;
+  transform:scale(.95);transition:transform .3s cubic-bezier(.2,.9,.3,1);
+}
+.video-lightbox-modal.open .vl-container{
+  transform:scale(1);
+}
+.vl-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.9rem 1.4rem;border-bottom:1px solid rgba(255,255,255,.08);
+  background:rgba(12,12,18,.7);
+}
+.vl-tag{
+  font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--a2);display:flex;align-items:center;gap:.5rem;
+}
+.vl-tag::before{
+  content:'';width:7px;height:7px;border-radius:50%;background:var(--a2);
+  box-shadow:0 0 10px var(--a2);
+}
+.vl-close{
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  color:#fff;width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;transition:background .2s,transform .2s;
+}
+.vl-close:hover{background:rgba(255,60,90,.3);transform:scale(1.08)}
+.vl-player-wrap{
+  position:relative;width:100%;padding-top:56.25%;background:#000;
+}
+.vl-player-wrap iframe{
+  position:absolute;inset:0;width:100%;height:100%;border:0;
+}
+.vl-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:1rem;padding:1.1rem 1.4rem;
+  background:linear-gradient(180deg,rgba(10,10,14,.85),rgba(15,15,22,.95));
+  border-top:1px solid rgba(255,255,255,.08);
+  flex-wrap:wrap;
+}
+.vl-footer-text{
+  font-family:'Space Mono',monospace;font-size:11.5px;color:#cfcde8;
+}
+.vl-cta-btn{
+  display:inline-flex;align-items:center;gap:.6rem;
+  padding:.55rem 1.35rem;border-radius:999px;
+  background:linear-gradient(120deg,#ff3c5a,#e0409a,#a259ff);
+  font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:#fff;
+  border:1px solid rgba(255,255,255,.3);
+  box-shadow:0 4px 18px rgba(255,60,90,.35);
+  cursor:pointer;transition:transform .2s,box-shadow .2s;
+}
+.vl-cta-btn:hover{
+  transform:translateY(-2px) scale(1.03);
+  box-shadow:0 8px 25px rgba(255,60,90,.55);
+}
+
 /* NAV CALC BUTTON */
 .nav-calc-pill{
   position:relative;display:inline-flex;align-items:center;justify-content:center;
@@ -1046,6 +1150,25 @@ footer a:hover{color:var(--a2)}
   </div>
 </div>
 
+<!-- ═══ INLINE VIDEO LIGHTBOX MODAL ═══ -->
+<div id="vl-modal" class="video-lightbox-modal" role="dialog" aria-modal="true" aria-label="Video Player">
+  <div class="vl-container">
+    <div class="vl-header">
+      <div id="vl-tag" class="vl-tag">AI VIDEO PRODUCTION</div>
+      <button type="button" class="vl-close" id="vl-close-btn" aria-label="Close video">×</button>
+    </div>
+    <div class="vl-player-wrap">
+      <iframe id="vl-iframe" src="about:blank" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+    <div class="vl-footer">
+      <span class="vl-footer-text" data-i18n="vl.footer_text">Like this style? Let's produce a high-conversion video for your product.</span>
+      <button type="button" id="vl-calc-cta" class="vl-cta-btn">
+        <span data-i18n="vl.cta">Calculate Similar Video</span> ⚡
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ══ PORTFOLIO DATA — swap video IDs here (see README) ══
 const SECTION_DATA = [
@@ -1313,7 +1436,11 @@ const I18N = {
     'calc.success_title':'Request Received!',
     'calc.success_desc':'Thank you! I have received your request and calculated parameters. I will review your task and get in touch within 2–4 hours.',
     'calc.success_close':'Close',
-    'calc.val_err':'Please provide your Telegram or Email so I can reach you.'
+    'calc.val_err':'Please provide your Telegram or Email so I can reach you.',
+    'vl.footer_text':'Like this style? Let\'s produce a high-conversion video for your product.',
+    'vl.cta':'Calculate Similar Video',
+    'bridge.title':'Need a high-impact video in this style?',
+    'bridge.btn':'Calculate Budget'
   },
   ru: {
     'nav.about':'О себе','nav.works':'Работы','nav.skills':'Навыки','nav.contact':'Контакты','nav.calc':'Рассчитать',
@@ -1372,7 +1499,11 @@ const I18N = {
     'calc.success_title':'Заявка принята!',
     'calc.success_desc':'Спасибо! Я получил вашу заявку с параметрами расчёта. Ознакомлюсь с задачей и свяжусь с вами в течение 2–4 часов.',
     'calc.success_close':'Закрыть',
-    'calc.val_err':'Пожалуйста, укажите ваш Telegram или Email для связи.'
+    'calc.val_err':'Пожалуйста, укажите ваш Telegram или Email для связи.',
+    'vl.footer_text':'Понравился стиль? Создадим продающий видеоролик под ваш продукт.',
+    'vl.cta':'Рассчитать похожий ролик',
+    'bridge.title':'Нужен взрывной ролик в таком стиле?',
+    'bridge.btn':'Рассчитать бюджет'
   }
 };
 let LANG = 'en';
@@ -1432,8 +1563,34 @@ const GRADS = [
 ];
 const PLAY = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><polygon points="3,1 15,8 3,15" fill="#00f5c8"/></svg>`;
 
+function openLightbox(v, tag){
+  const lb = document.getElementById('vl-modal');
+  const iframe = document.getElementById('vl-iframe');
+  const tagEl = document.getElementById('vl-tag');
+  const wrap = document.querySelector('.vl-player-wrap');
+  const container = document.querySelector('.vl-container');
+  if (!lb || !iframe) return;
+
+  const isVertical = parseFloat(v.pb) > 120;
+  if (wrap) wrap.style.paddingTop = isVertical ? '140%' : '56.25%';
+  if (container) container.style.maxWidth = isVertical ? '460px' : '880px';
+
+  iframe.src = `https://drive.google.com/file/d/${v.id}/preview`;
+  if (tagEl) tagEl.textContent = (tag || 'PORTFOLIO VIDEO').toUpperCase();
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(){
+  const lb = document.getElementById('vl-modal');
+  const iframe = document.getElementById('vl-iframe');
+  if (!lb) return;
+  lb.classList.remove('open');
+  if (iframe) iframe.src = 'about:blank';
+  document.body.style.overflow = '';
+}
+
 function buildCard(v, i, tag){
-  const url   = `https://drive.google.com/file/d/${v.id}/view`;
   const thumb = `https://drive.google.com/thumbnail?id=${v.id}&sz=w600`;
   const grad  = GRADS[i % GRADS.length];
   const card  = document.createElement('div');
@@ -1448,7 +1605,7 @@ function buildCard(v, i, tag){
       <div class="vc-tag">${tag}</div>
       <div class="vc-name">${String(i+1).padStart(2,'0')}</div>
     </div>`;
-  card.addEventListener('click', () => window.open(url, '_blank', 'noopener'));
+  card.addEventListener('click', () => openLightbox(v, tag));
   return card;
 }
 function getMasonryColumnCount(){
@@ -1474,6 +1631,29 @@ function buildMasonry(videos, tag, carousel){
     columns[target].appendChild(card);
     heights[target] += (1 / count) * (parseFloat(v.pb) / 100) + 0.006;
   });
+
+  // End-card CTA bridge
+  const bridge = document.createElement('div');
+  bridge.className = 'video-card cta-bridge-card';
+  bridge.innerHTML = `
+    <div class="bridge-card-inner">
+      <div class="bridge-tag">${tag.toUpperCase()}</div>
+      <div class="bridge-title" data-i18n="bridge.title">${t('bridge.title')}</div>
+      <div class="bridge-action"><span data-i18n="bridge.btn">${t('bridge.btn')}</span> ⚡</div>
+    </div>`;
+  bridge.addEventListener('click', () => {
+    openCalcModal();
+    if (tag.toLowerCase().includes('ai')) {
+      const el = document.querySelector('#calc-services-grid [data-service="ai_video"]');
+      if (el) el.click();
+    } else if (tag.toLowerCase().includes('motion')) {
+      const el = document.querySelector('#calc-services-grid [data-service="motion"]');
+      if (el) el.click();
+    }
+  });
+  let bridgeTarget = 0;
+  for (let c = 1; c < count; c++) if (heights[c] < heights[bridgeTarget]) bridgeTarget = c;
+  columns[bridgeTarget].appendChild(bridge);
 }
 // Both sections start COLLAPSED — the visitor opens what they want.
 function buildSection(sec, idx){
@@ -1658,9 +1838,15 @@ const summaryBadge = document.getElementById('calc-summary-badge');
 
 function openCalcModal(){
   if (!modal) return;
+  const card = modal.querySelector('.calc-card');
+  if (card) card.scrollTop = 0;
+  modal.scrollTop = 0;
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
-  setTimeout(() => { if (contactInput) contactInput.focus(); }, 150);
+  requestAnimationFrame(() => {
+    if (card) card.scrollTop = 0;
+    modal.scrollTop = 0;
+  });
 }
 
 function closeCalcModal(){
@@ -1689,8 +1875,27 @@ if (modal){
   });
 }
 
+const vlModal = document.getElementById('vl-modal');
+const vlCloseBtn = document.getElementById('vl-close-btn');
+const vlCalcCta = document.getElementById('vl-calc-cta');
+if (vlCloseBtn) vlCloseBtn.addEventListener('click', closeLightbox);
+if (vlModal){
+  vlModal.addEventListener('click', (e) => {
+    if (e.target === vlModal) closeLightbox();
+  });
+}
+if (vlCalcCta){
+  vlCalcCta.addEventListener('click', () => {
+    closeLightbox();
+    openCalcModal();
+  });
+}
+
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && modal && modal.classList.contains('open')) closeCalcModal();
+  if (e.key === 'Escape') {
+    closeLightbox();
+    if (modal && modal.classList.contains('open')) closeCalcModal();
+  }
 });
 
 // Services Selection
