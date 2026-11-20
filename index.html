@@ -232,6 +232,8 @@ nav.shrunk{padding:.42rem 1.1rem .42rem 1.4rem;background:linear-gradient(152deg
   .hero-avatar{right:-14vw;height:66vh;top:56%}
 }
 @media(max-width:640px){
+  /* No fixed-width clipping container: the transparent clip may extend left.
+     The hero itself clips only content outside of the page edge. */
   .hero-avatar{
     top:auto;right:-1vw;bottom:6.85rem;transform:none;
     width:auto;height:18.5rem;max-height:36svh;overflow:visible;
@@ -443,6 +445,7 @@ nav.shrunk{padding:.42rem 1.1rem .42rem 1.4rem;background:linear-gradient(152deg
   color:#fff;
   background:linear-gradient(120deg,#ff3c5a 0%,#e0409a 52%,#a259ff 100%);
   background-size:200% 100%;
+  border:0;outline:none;cursor:pointer;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.42),
     inset 0 -1px 1px rgba(0,0,0,.25),
@@ -497,6 +500,245 @@ footer a:hover{color:var(--a2)}
   .reveal{opacity:1;transform:none;transition:none}
   .marquee-track,.orb{animation:none}
   html{scroll-behavior:auto}
+}
+
+/* ═══ PROJECT CALCULATOR MODAL ═══ */
+.calc-modal-backdrop{
+  position:fixed;inset:0;z-index:99999;
+  background:rgba(6,6,8,0.82);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  display:flex;align-items:center;justify-content:center;
+  padding:1.2rem;
+  opacity:0;pointer-events:none;visibility:hidden;
+  transition:opacity .35s cubic-bezier(.23,1,.32,1),visibility .35s;
+}
+.calc-modal-backdrop.open{
+  opacity:1;pointer-events:auto;visibility:visible;
+}
+.calc-card{
+  width:100%;max-width:680px;max-height:90vh;overflow-y:auto;
+  background:linear-gradient(155deg,rgba(22,22,32,0.95),rgba(12,12,17,0.97));
+  border:1px solid rgba(255,255,255,0.14);border-radius:24px;
+  box-shadow:0 24px 64px rgba(0,0,0,0.8),0 0 50px rgba(0,245,200,0.09),inset 0 1px 0 rgba(255,255,255,0.22);
+  padding:2.4rem;position:relative;
+  transform:scale(0.95) translateY(18px);
+  transition:transform .35s cubic-bezier(.23,1,.32,1);
+  color:var(--ink);
+}
+.calc-modal-backdrop.open .calc-card{
+  transform:scale(1) translateY(0);
+}
+.calc-card::-webkit-scrollbar{width:5px}
+.calc-card::-webkit-scrollbar-track{background:rgba(0,0,0,0.25);border-radius:10px}
+.calc-card::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.22);border-radius:10px}
+.calc-card::-webkit-scrollbar-thumb:hover{background:var(--a2)}
+
+.calc-close{
+  position:absolute;top:1.25rem;right:1.25rem;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  color:var(--muted-hi);font-size:22px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .25s ease;z-index:10;
+}
+.calc-close:hover{
+  background:rgba(255,60,90,0.25);border-color:var(--a1);color:#fff;
+  transform:rotate(90deg);
+}
+
+.calc-header{margin-bottom:1.8rem;padding-right:2.5rem}
+.calc-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--a2);
+  margin-bottom:.5rem;
+}
+.calc-badge::before{
+  content:'';width:7px;height:7px;border-radius:50%;
+  background:var(--a2);box-shadow:0 0 10px var(--a2);
+}
+.calc-title{
+  font-family:'Unbounded',sans-serif;font-size:clamp(20px,3.5vw,26px);
+  font-weight:800;letter-spacing:-.02em;line-height:1.2;
+}
+.calc-sub{
+  font-size:12px;color:var(--muted);letter-spacing:.06em;margin-top:.4rem;line-height:1.5;
+}
+
+.calc-section{margin-bottom:1.6rem}
+.calc-label{
+  display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted-hi);margin-bottom:.75rem;font-weight:700;
+}
+
+/* Service Options Grid */
+.calc-grid-services{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;
+}
+.calc-opt-service{
+  position:relative;display:flex;flex-direction:column;
+  padding:1rem 1.1rem;background:rgba(255,255,255,0.035);
+  border:1px solid rgba(255,255,255,0.09);border-radius:14px;
+  cursor:pointer;transition:all .25s cubic-bezier(.23,1,.32,1);
+  user-select:none;
+}
+.calc-opt-service:hover{
+  background:rgba(255,255,255,0.065);border-color:rgba(255,255,255,0.22);
+  transform:translateY(-2px);
+}
+.calc-opt-service.active{
+  background:linear-gradient(145deg,rgba(0,245,200,0.12),rgba(162,89,255,0.09));
+  border-color:var(--a2);
+  box-shadow:0 0 20px rgba(0,245,200,0.18),inset 0 1px 0 rgba(255,255,255,0.25);
+}
+.calc-opt-name{
+  font-size:12.5px;font-weight:700;color:#fff;letter-spacing:.05em;margin-bottom:.25rem;
+}
+.calc-opt-service.active .calc-opt-name{color:var(--a2)}
+.calc-opt-desc{
+  font-size:10px;color:var(--muted);letter-spacing:.03em;line-height:1.4;
+}
+
+/* Chips grid for duration / scope */
+.calc-chips-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:.65rem;
+}
+.calc-chip{
+  padding:.8rem 1rem;background:rgba(255,255,255,0.035);
+  border:1px solid rgba(255,255,255,0.08);border-radius:12px;
+  font-size:11.5px;letter-spacing:.05em;color:var(--ink);
+  cursor:pointer;text-align:center;transition:all .25s ease;
+  user-select:none;
+}
+.calc-chip:hover{
+  background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.2);
+}
+.calc-chip.active{
+  background:linear-gradient(135deg,rgba(162,89,255,0.22),rgba(255,60,90,0.18));
+  border-color:var(--a3);color:#fff;
+  box-shadow:0 0 18px rgba(162,89,255,0.28);font-weight:700;
+}
+
+/* Checkboxes for addons */
+.calc-addons-list{
+  display:flex;flex-direction:column;gap:.55rem;
+}
+.calc-addon-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.85rem 1.1rem;background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.07);border-radius:12px;
+  cursor:pointer;transition:all .25s ease;user-select:none;
+}
+.calc-addon-item:hover{
+  background:rgba(255,255,255,0.055);border-color:rgba(255,255,255,0.16);
+}
+.calc-addon-item.active{
+  background:rgba(0,245,200,0.07);border-color:rgba(0,245,200,0.48);
+}
+.calc-addon-left{
+  display:flex;align-items:center;gap:.75rem;
+  font-size:11.5px;letter-spacing:.04em;
+}
+.calc-check-box{
+  width:18px;height:18px;border-radius:5px;
+  border:1px solid rgba(255,255,255,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:transparent;transition:all .2s;
+  flex-shrink:0;
+}
+.calc-addon-item.active .calc-check-box{
+  background:var(--a2);border-color:var(--a2);color:#060608;font-weight:900;
+}
+.calc-addon-price{
+  font-size:11px;color:var(--a2);font-weight:700;letter-spacing:.05em;white-space:nowrap;margin-left:.6rem;
+}
+
+/* Estimated Budget Banner */
+.calc-estimate-box{
+  background:linear-gradient(135deg,rgba(255,60,90,0.14),rgba(162,89,255,0.16),rgba(0,245,200,0.12));
+  border:1px solid rgba(255,255,255,0.18);border-radius:16px;
+  padding:1.25rem 1.4rem;display:flex;align-items:center;justify-content:space-between;
+  gap:1rem;margin:1.8rem 0;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.22),0 14px 34px rgba(0,0,0,0.35);
+}
+.calc-estimate-info{display:flex;flex-direction:column}
+.calc-estimate-tag{
+  font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted-hi);font-weight:700;
+}
+.calc-estimate-disclaimer{
+  font-size:9.5px;color:var(--muted);letter-spacing:.03em;margin-top:.25rem;line-height:1.4;
+}
+.calc-estimate-amount{
+  font-family:'Unbounded',sans-serif;font-size:clamp(22px,4vw,30px);font-weight:900;
+  background:linear-gradient(120deg,#ff3c5a,#00f5c8);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  white-space:nowrap;
+}
+
+/* Contact Inputs */
+.calc-inputs{display:flex;flex-direction:column;gap:.8rem;margin-bottom:1.5rem}
+.calc-input,.calc-textarea{
+  width:100%;padding:.95rem 1.2rem;
+  background:rgba(0,0,0,0.38);border:1px solid rgba(255,255,255,0.12);
+  border-radius:12px;color:#fff;
+  font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.05em;
+  outline:none;transition:all .25s ease;
+}
+.calc-input:focus,.calc-textarea:focus{
+  border-color:var(--a2);background:rgba(0,0,0,0.58);
+  box-shadow:0 0 16px rgba(0,245,200,0.18);
+}
+.calc-input::placeholder,.calc-textarea::placeholder{
+  color:rgba(122,120,158,0.7);
+}
+.calc-textarea{min-height:80px;resize:vertical}
+
+/* Submit Button & State */
+.calc-submit-btn{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:.8rem;
+  padding:1.15rem 2rem;border-radius:999px;
+  background:linear-gradient(120deg,#ff3c5a 0%,#e0409a 52%,#a259ff 100%);
+  background-size:200% 100%;color:#fff;
+  font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;border:0;outline:none;cursor:pointer;
+  transition:transform .4s cubic-bezier(.23,1,.32,1),box-shadow .4s;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 14px 36px rgba(255,60,90,.3);
+}
+.calc-submit-btn:hover{
+  transform:translateY(-3px) scale(1.015);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 20px 48px rgba(255,60,90,.5),0 0 30px rgba(162,89,255,.3);
+}
+.calc-submit-btn:disabled{
+  opacity:.6;cursor:not-allowed;transform:none;
+}
+.calc-error{
+  color:var(--a1);font-size:11px;letter-spacing:.05em;margin-top:.6rem;text-align:center;display:none;
+}
+
+/* Success View */
+.calc-success-box{display:none;text-align:center;padding:2.5rem 1.2rem}
+.calc-success-icon{
+  width:68px;height:68px;margin:0 auto 1.4rem;border-radius:50%;
+  background:rgba(0,245,200,0.12);border:2px solid var(--a2);
+  box-shadow:0 0 32px rgba(0,245,200,0.35);
+  display:flex;align-items:center;justify-content:center;
+  font-size:32px;color:var(--a2);
+}
+.calc-success-title{
+  font-family:'Unbounded',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:.8rem;
+}
+.calc-success-desc{
+  font-size:12px;color:var(--muted-hi);line-height:1.6;max-width:440px;margin:0 auto 1.6rem;letter-spacing:.04em;
+}
+.calc-success-summary{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.8rem;
+  font-size:11px;color:var(--a2);letter-spacing:.06em;
+}
+
+@media(max-width:580px){
+  .calc-card{padding:1.6rem 1.1rem;border-radius:20px}
+  .calc-grid-services,.calc-chips-grid{grid-template-columns:1fr}
+  .calc-estimate-box{flex-direction:column;text-align:center;gap:.6rem}
 }
 </style>
 </head>
@@ -647,12 +889,12 @@ footer a:hover{color:var(--a2)}
     <a href="https://goo.su/Ho71jP" class="contact-link" target="_blank" rel="noopener" data-i18n="contact.drive">Portfolio Drive</a>
   </div>
 
-  <!-- PRIMARY CTA — swap the href for your Google Form link -->
+  <!-- PRIMARY CTA — opens interactive cost calculator & project brief modal -->
   <div class="cta-wrap reveal">
-    <a href="https://forms.gle/YOUR_FORM_ID" class="cta-main" target="_blank" rel="noopener">
+    <button type="button" id="open-calc-btn" class="cta-main" aria-haspopup="dialog" aria-controls="calc-modal">
       <span data-i18n="cta.main">Start a project</span>
       <span class="cta-arw">→</span>
-    </a>
+    </button>
     <span class="cta-note" data-i18n="cta.note">Takes 2 minutes — tell me about your task</span>
   </div>
 </section>
@@ -663,6 +905,118 @@ footer a:hover{color:var(--a2)}
   <span>Motion · AI · Visual</span>
   <a href="https://t.me/gknyaz" target="_blank" rel="noopener">@gknyaz</a>
 </footer>
+
+<!-- ═══ PROJECT CALCULATOR & BRIEF MODAL ═══ -->
+<div id="calc-modal" class="calc-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="calc-modal-title">
+  <div class="calc-card">
+    <button type="button" class="calc-close" id="calc-close-btn" aria-label="Close modal">×</button>
+
+    <!-- Normal Form View -->
+    <div id="calc-form-view">
+      <div class="calc-header">
+        <span class="calc-badge" data-i18n="calc.badge">ESTIMATE &amp; BRIEF</span>
+        <h3 id="calc-modal-title" class="calc-title irid" data-i18n="calc.title">PROJECT CALCULATOR</h3>
+        <p class="calc-sub" data-i18n="calc.sub">Interactive estimator — calculate approximate budget and brief your task</p>
+      </div>
+
+      <!-- Step 1: Services -->
+      <div class="calc-section">
+        <span class="calc-label" data-i18n="calc.service">1. Select Core Service</span>
+        <div class="calc-grid-services" id="calc-services-grid">
+          <div class="calc-opt-service active" data-service="ai_video">
+            <span class="calc-opt-name" data-i18n="calc.srv.ai">⚡ AI Video Gen</span>
+            <span class="calc-opt-desc" data-i18n="calc.srv.ai_desc">Kling · Runway · Sora · Flux · Pika</span>
+          </div>
+          <div class="calc-opt-service" data-service="motion">
+            <span class="calc-opt-name" data-i18n="calc.srv.motion">🎬 Motion Design</span>
+            <span class="calc-opt-desc" data-i18n="calc.srv.motion_desc">After Effects · 2D / 3D · VFX · Compositing</span>
+          </div>
+          <div class="calc-opt-service" data-service="perf_ads">
+            <span class="calc-opt-name" data-i18n="calc.srv.perf">📱 Performance Ads</span>
+            <span class="calc-opt-desc" data-i18n="calc.srv.perf_desc">High-conversion UGC &amp; hook creatives</span>
+          </div>
+          <div class="calc-opt-service" data-service="full_cycle">
+            <span class="calc-opt-name" data-i18n="calc.srv.full">🚀 Full Cycle Production</span>
+            <span class="calc-opt-desc" data-i18n="calc.srv.full_desc">From idea &amp; script to final cut &amp; audio</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Duration / Volume -->
+      <div class="calc-section">
+        <span class="calc-label" data-i18n="calc.scope">2. Volume &amp; Duration</span>
+        <div class="calc-chips-grid" id="calc-scope-grid">
+          <div class="calc-chip active" data-scope="15s" data-i18n="calc.scope.15s">15s Short / Reel</div>
+          <div class="calc-chip" data-scope="30_60s" data-i18n="calc.scope.30s">30–60s Promo</div>
+          <div class="calc-chip" data-scope="pack3" data-i18n="calc.scope.pack3">Pack of 3 Variations</div>
+          <div class="calc-chip" data-scope="pack5" data-i18n="calc.scope.pack5">Pack of 5 Variations</div>
+        </div>
+      </div>
+
+      <!-- Step 3: Addons -->
+      <div class="calc-section">
+        <span class="calc-label" data-i18n="calc.addons">3. Add-on Options</span>
+        <div class="calc-addons-list">
+          <div class="calc-addon-item" data-addon="voiceover">
+            <div class="calc-addon-left">
+              <span class="calc-check-box">✓</span>
+              <span data-i18n="calc.opt.voice">AI Voiceover (ElevenLabs) + SFX</span>
+            </div>
+            <span class="calc-addon-price">+$20–$30</span>
+          </div>
+          <div class="calc-addon-item" data-addon="script">
+            <div class="calc-addon-left">
+              <span class="calc-check-box">✓</span>
+              <span data-i18n="calc.opt.script">Scriptwriting &amp; Storyboard</span>
+            </div>
+            <span class="calc-addon-price">+$30–$50</span>
+          </div>
+          <div class="calc-addon-item" data-addon="express">
+            <div class="calc-addon-left">
+              <span class="calc-check-box">✓</span>
+              <span data-i18n="calc.opt.express">Express Delivery (&lt; 48 hours)</span>
+            </div>
+            <span class="calc-addon-price">+25%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Budget Display -->
+      <div class="calc-estimate-box">
+        <div class="calc-estimate-info">
+          <span class="calc-estimate-tag" data-i18n="calc.est_label">ESTIMATED BUDGET</span>
+          <span class="calc-estimate-disclaimer" data-i18n="calc.est_note">*Preliminary estimate. Final quote confirmed after script review.</span>
+        </div>
+        <div class="calc-estimate-amount" id="calc-estimate-val">$70 – $110</div>
+      </div>
+
+      <!-- Step 4: Contact & Brief -->
+      <div class="calc-section">
+        <span class="calc-label" data-i18n="calc.contact_label">4. Your Contacts &amp; Task Brief</span>
+        <div class="calc-inputs">
+          <input type="text" id="calc-contact" class="calc-input" placeholder="Telegram (@username) or Email *" data-i18n-placeholder="calc.ph_contact" autocomplete="off" required>
+          <textarea id="calc-message" class="calc-textarea" placeholder="Brief details, deadline or reference links..." data-i18n-placeholder="calc.ph_msg"></textarea>
+        </div>
+      </div>
+
+      <button type="button" id="calc-submit-btn" class="calc-submit-btn">
+        <span id="calc-submit-text" data-i18n="calc.submit">Send Request →</span>
+      </button>
+      <div id="calc-error-msg" class="calc-error" data-i18n="calc.val_err">Please provide your Telegram or Email so I can reach you.</div>
+    </div>
+
+    <!-- Success View -->
+    <div id="calc-success-view" class="calc-success-box">
+      <div class="calc-success-icon">✓</div>
+      <h3 class="calc-success-title" data-i18n="calc.success_title">Request Received!</h3>
+      <p class="calc-success-desc" data-i18n="calc.success_desc">Thank you! I have received your request and calculated parameters. I will review your task and get in touch within 2–4 hours.</p>
+      <div id="calc-summary-badge" class="calc-success-summary">AI Video Gen · 15s Short · ~$70 – $110</div>
+      <button type="button" id="calc-success-close-btn" class="calc-submit-btn" style="max-width:240px;margin:0 auto">
+        <span data-i18n="calc.success_close">Close</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ══ PORTFOLIO DATA — swap video IDs here (see README) ══
@@ -899,7 +1253,39 @@ const I18N = {
       {n:'04',c:'var(--tif)',t:'Pipeline<br>Automation',d:'n8n and custom AE scripts. Automating routine work and speeding up creative and variation builds.'},
       {n:'05',c:'#0099ff',t:'Brand<br>Visual',d:'Logo animation, motion identity, banners, GIFs. Format adaptation for any platform and GEO.'},
       {n:'06',c:'var(--a2)',t:'AI Image<br>&amp; Prompting',d:'Midjourney · Flux · ComfyUI · SD · ControlNet. Character consistency, deepfake pipelines, packshots.'}
-    ]
+    ],
+    'calc.badge':'ESTIMATE & BRIEF',
+    'calc.title':'PROJECT CALCULATOR',
+    'calc.sub':'Interactive estimator — calculate approximate budget and brief your task',
+    'calc.service':'1. Select Core Service',
+    'calc.srv.ai':'⚡ AI Video Gen',
+    'calc.srv.ai_desc':'Kling · Runway · Sora · Flux · Pika',
+    'calc.srv.motion':'🎬 Motion Design',
+    'calc.srv.motion_desc':'After Effects · 2D / 3D · VFX · Compositing',
+    'calc.srv.perf':'📱 Performance Ads',
+    'calc.srv.perf_desc':'High-conversion UGC & hook creatives',
+    'calc.srv.full':'🚀 Full Cycle Production',
+    'calc.srv.full_desc':'From idea & script to final cut & audio',
+    'calc.scope':'2. Volume & Duration',
+    'calc.scope.15s':'15s Short / Reel',
+    'calc.scope.30s':'30–60s Promo',
+    'calc.scope.pack3':'Pack of 3 Variations',
+    'calc.scope.pack5':'Pack of 5 Variations',
+    'calc.addons':'3. Add-on Options',
+    'calc.opt.voice':'AI Voiceover (ElevenLabs) + SFX',
+    'calc.opt.script':'Scriptwriting & Storyboard',
+    'calc.opt.express':'Express Delivery (< 48 hours)',
+    'calc.est_label':'ESTIMATED BUDGET',
+    'calc.est_note':'*Preliminary estimate. Final quote confirmed after script review.',
+    'calc.contact_label':'4. Your Contacts & Task Brief',
+    'calc.ph_contact':'Telegram (@username) or Email *',
+    'calc.ph_msg':'Brief details, deadline or reference links...',
+    'calc.submit':'Send Request →',
+    'calc.sending':'Sending...',
+    'calc.success_title':'Request Received!',
+    'calc.success_desc':'Thank you! I have received your request and calculated parameters. I will review your task and get in touch within 2–4 hours.',
+    'calc.success_close':'Close',
+    'calc.val_err':'Please provide your Telegram or Email so I can reach you.'
   },
   ru: {
     'nav.about':'О себе','nav.works':'Работы','nav.skills':'Навыки','nav.contact':'Контакты',
@@ -926,7 +1312,39 @@ const I18N = {
       {n:'04',c:'var(--tif)',t:'Pipeline<br>Automation',d:'n8n, кастомные AE-скрипты. Оптимизация рутинных процессов, ускорение сборки креативов и вариаций.'},
       {n:'05',c:'#0099ff',t:'Brand<br>Visual',d:'Лого-анимации, моушн-айдентика, баннеры, GIF. Адаптация форматов под любые платформы и ГЕО.'},
       {n:'06',c:'var(--a2)',t:'AI Image<br>&amp; Prompting',d:'Midjourney · Flux · ComfyUI · SD · ControlNet. Character consistency, deepfake pipelines, пэкшоты.'}
-    ]
+    ],
+    'calc.badge':'КАЛЬКУЛЯТОР & БРИФ',
+    'calc.title':'РАСЧЁТ ПРОЕКТА',
+    'calc.sub':'Интерактивный расчёт — узнайте ориентировочный бюджет и опишите задачу',
+    'calc.service':'1. Выберите направление',
+    'calc.srv.ai':'⚡ AI-видеогенерация',
+    'calc.srv.ai_desc':'Kling · Runway · Sora · Flux · Pika',
+    'calc.srv.motion':'🎬 Моушн-дизайн',
+    'calc.srv.motion_desc':'After Effects · 2D / 3D · VFX · Композитинг',
+    'calc.srv.perf':'📱 Перформанс-креативы',
+    'calc.srv.perf_desc':'Вирусные UGC и хуки для TikTok / Reels / Meta',
+    'calc.srv.full':'🚀 Продакшн под ключ',
+    'calc.srv.full_desc':'От идеи и сценария до финального рендера и звука',
+    'calc.scope':'2. Объём и хронометраж',
+    'calc.scope.15s':'15 сек (Shorts / Reels)',
+    'calc.scope.30s':'30–60 сек (Промо)',
+    'calc.scope.pack3':'Пакет 3 вариации (A/B)',
+    'calc.scope.pack5':'Пакет 5 вариаций',
+    'calc.addons':'3. Дополнительные опции',
+    'calc.opt.voice':'AI-диктор (ElevenLabs) + саунд-дизайн (SFX)',
+    'calc.opt.script':'Написание сценария и раскадровка',
+    'calc.opt.express':'Срочный дедлайн (< 48 часов)',
+    'calc.est_label':'ОРИЕНТИРОВОЧНЫЙ БЮДЖЕТ',
+    'calc.est_note':'*Предварительный расчёт. Точная сумма согласуется после ознакомления с ТЗ.',
+    'calc.contact_label':'4. Ваши контакты и задача',
+    'calc.ph_contact':'Telegram (@username) или Email *',
+    'calc.ph_msg':'Пара слов о задаче, дедлайн или ссылки на референсы...',
+    'calc.submit':'Отправить заявку →',
+    'calc.sending':'Отправка...',
+    'calc.success_title':'Заявка принята!',
+    'calc.success_desc':'Спасибо! Я получил вашу заявку с параметрами расчёта. Ознакомлюсь с задачей и свяжусь с вами в течение 2–4 часов.',
+    'calc.success_close':'Закрыть',
+    'calc.val_err':'Пожалуйста, укажите ваш Telegram или Email для связи.'
   }
 };
 let LANG = 'en';
@@ -941,8 +1359,10 @@ function applyLang(next){
 
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
   document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
 
   renderMarquee(); renderSkills(); renderWorks();
+  if (typeof updateCalcTexts === 'function') updateCalcTexts();
   try{ localStorage.setItem('lang', LANG); }catch(e){}
 }
 document.getElementById('lang').addEventListener('click', e => {
@@ -1132,12 +1552,256 @@ if (window.matchMedia('(hover:hover)').matches){
     ring.style.left=rx+'px'; ring.style.top=ry+'px';
     requestAnimationFrame(animRing);
   })();
-  const HOT='a,.skill-card,.video-card,.accordion-header,.contact-link,button';
+  const HOT='a,.skill-card,.video-card,.accordion-header,.contact-link,button,.calc-opt-service,.calc-chip,.calc-addon-item';
   document.addEventListener('mouseover', e => {
     if (e.target.closest(HOT)){ cursor.style.transform='scale(2.4)'; ring.style.opacity='.15'; }
   });
   document.addEventListener('mouseout', e => {
     if (e.target.closest(HOT)){ cursor.style.transform='scale(1)'; ring.style.opacity='.5'; }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+//  PROJECT CALCULATOR & BRIEF SCRIPT
+// ══════════════════════════════════════════════════════════
+// Google Apps Script Webhook URL (optional):
+const GOOGLE_SCRIPT_URL = ''; 
+
+// Telegram Bot direct delivery:
+// Paste your Telegram Bot Token and your personal Chat ID here:
+const TELEGRAM_BOT_TOKEN = '';
+const TELEGRAM_CHAT_ID = ''; 
+
+const CALC_PRICING = {
+  services: {
+    ai_video:   { min: 70,  max: 110, titleEn: 'AI Video Gen', titleRu: 'AI-видеогенерация' },
+    motion:     { min: 90,  max: 140, titleEn: 'Motion Design', titleRu: 'Моушн-дизайн' },
+    perf_ads:   { min: 80,  max: 130, titleEn: 'Performance Ads', titleRu: 'Перформанс-реклама' },
+    full_cycle: { min: 160, max: 250, titleEn: 'Full Cycle Production', titleRu: 'Продакшн под ключ' }
+  },
+  scopes: {
+    '15s':    { mult: 1.0,  titleEn: '15s Short / Reel', titleRu: '15 сек (Shorts / Reels)' },
+    '30_60s': { mult: 1.35, titleEn: '30–60s Promo', titleRu: '30–60 сек (Промо)' },
+    'pack3':  { mult: 1.6,  titleEn: 'Pack of 3 Variations', titleRu: 'Пакет 3 вариации' },
+    'pack5':  { mult: 2.1,  titleEn: 'Pack of 5 Variations', titleRu: 'Пакет 5 вариаций' }
+  },
+  addons: {
+    voiceover: { min: 20, max: 30, titleEn: 'AI Voiceover + SFX', titleRu: 'AI-диктор + SFX' },
+    script:    { min: 30, max: 50, titleEn: 'Scriptwriting & Storyboard', titleRu: 'Сценарий и раскадровка' },
+    express:   { mult: 1.25, titleEn: 'Express (< 48h)', titleRu: 'Срочный заказ (< 48ч)' }
+  }
+};
+
+let currentService = 'ai_video';
+let currentScope = '15s';
+const selectedAddons = new Set();
+let calculatedMin = 70;
+let calculatedMax = 110;
+
+const modal = document.getElementById('calc-modal');
+const openBtn = document.getElementById('open-calc-btn');
+const closeBtn = document.getElementById('calc-close-btn');
+const successCloseBtn = document.getElementById('calc-success-close-btn');
+const formView = document.getElementById('calc-form-view');
+const successView = document.getElementById('calc-success-view');
+const estimateVal = document.getElementById('calc-estimate-val');
+const submitBtn = document.getElementById('calc-submit-btn');
+const submitText = document.getElementById('calc-submit-text');
+const errorMsg = document.getElementById('calc-error-msg');
+const contactInput = document.getElementById('calc-contact');
+const messageInput = document.getElementById('calc-message');
+const summaryBadge = document.getElementById('calc-summary-badge');
+
+function openCalcModal(){
+  if (!modal) return;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => { if (contactInput) contactInput.focus(); }, 150);
+}
+
+function closeCalcModal(){
+  if (!modal) return;
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+if (openBtn) openBtn.addEventListener('click', openCalcModal);
+if (closeBtn) closeBtn.addEventListener('click', closeCalcModal);
+if (successCloseBtn) successCloseBtn.addEventListener('click', () => {
+  closeCalcModal();
+  setTimeout(() => {
+    successView.style.display = 'none';
+    formView.style.display = 'block';
+    if (contactInput) contactInput.value = '';
+    if (messageInput) messageInput.value = '';
+  }, 350);
+});
+
+if (modal){
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeCalcModal();
+  });
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modal && modal.classList.contains('open')) closeCalcModal();
+});
+
+// Services Selection
+document.querySelectorAll('#calc-services-grid .calc-opt-service').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('#calc-services-grid .calc-opt-service').forEach(x => x.classList.remove('active'));
+    item.classList.add('active');
+    currentService = item.dataset.service;
+    updateCalculation();
+  });
+});
+
+// Scope Selection
+document.querySelectorAll('#calc-scope-grid .calc-chip').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('#calc-scope-grid .calc-chip').forEach(x => x.classList.remove('active'));
+    item.classList.add('active');
+    currentScope = item.dataset.scope;
+    updateCalculation();
+  });
+});
+
+// Addons Toggle
+document.querySelectorAll('.calc-addon-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const addon = item.dataset.addon;
+    if (selectedAddons.has(addon)){
+      selectedAddons.delete(addon);
+      item.classList.remove('active');
+    } else {
+      selectedAddons.add(addon);
+      item.classList.add('active');
+    }
+    updateCalculation();
+  });
+});
+
+function updateCalculation(){
+  const srv = CALC_PRICING.services[currentService];
+  const scp = CALC_PRICING.scopes[currentScope];
+  if (!srv || !scp) return;
+
+  let min = srv.min * scp.mult;
+  let max = srv.max * scp.mult;
+
+  if (selectedAddons.has('voiceover')){
+    min += CALC_PRICING.addons.voiceover.min;
+    max += CALC_PRICING.addons.voiceover.max;
+  }
+  if (selectedAddons.has('script')){
+    min += CALC_PRICING.addons.script.min;
+    max += CALC_PRICING.addons.script.max;
+  }
+  if (selectedAddons.has('express')){
+    min *= CALC_PRICING.addons.express.mult;
+    max *= CALC_PRICING.addons.express.mult;
+  }
+
+  // Round to nearest 10
+  calculatedMin = Math.round(min / 10) * 10;
+  calculatedMax = Math.round(max / 10) * 10;
+
+  if (estimateVal) estimateVal.textContent = `$${calculatedMin} – $${calculatedMax}`;
+}
+
+function updateCalcTexts(){
+  updateCalculation();
+}
+
+// Form Submit
+if (submitBtn){
+  submitBtn.addEventListener('click', async () => {
+    const contact = contactInput ? contactInput.value.trim() : '';
+    if (!contact){
+      if (errorMsg) errorMsg.style.display = 'block';
+      if (contactInput) contactInput.focus();
+      return;
+    }
+    if (errorMsg) errorMsg.style.display = 'none';
+    submitBtn.disabled = true;
+    if (submitText) submitText.textContent = t('calc.sending');
+
+    const srv = CALC_PRICING.services[currentService];
+    const scp = CALC_PRICING.scopes[currentScope];
+    const srvTitle = LANG === 'ru' ? srv.titleRu : srv.titleEn;
+    const scpTitle = LANG === 'ru' ? scp.titleRu : scp.titleEn;
+    const addonsList = Array.from(selectedAddons).map(a => {
+      return LANG === 'ru' ? CALC_PRICING.addons[a].titleRu : CALC_PRICING.addons[a].titleEn;
+    });
+
+    const payload = {
+      timestamp: new Date().toISOString(),
+      contact: contact,
+      service: srvTitle,
+      scope: scpTitle,
+      addons: addonsList.join('; ') || 'None',
+      estimatedPrice: `$${calculatedMin} – $${calculatedMax}`,
+      message: (messageInput ? messageInput.value.trim() : '') || 'No additional comment',
+      lang: LANG
+    };
+
+    // Attempt sending to Telegram Bot
+    if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID){
+      try {
+        const tgText = `🔥 <b>НОВАЯ ЗАЯВКА С САЙТА chernenko.xyz</b>\n\n` +
+          `👤 <b>Контакт:</b> ${payload.contact}\n` +
+          `🎯 <b>Услуга:</b> ${payload.service}\n` +
+          `⏱ <b>Объем:</b> ${payload.scope}\n` +
+          `➕ <b>Опции:</b> ${payload.addons}\n` +
+          `💰 <b>Бюджет:</b> ${payload.estimatedPrice}\n` +
+          `📝 <b>ТЗ / Ссылка:</b> ${payload.message}\n` +
+          `🌐 <b>Язык сайта:</b> ${payload.lang.toUpperCase()}`;
+
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: tgText,
+            parse_mode: 'HTML'
+          })
+        });
+      } catch (err){
+        console.warn('Telegram sending error:', err);
+      }
+    }
+
+    // Attempt sending to Google Apps Script Webhook
+    if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')){
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (err){
+        console.warn('Network sending error:', err);
+      }
+    } else {
+      // Local demo mode simulation
+      await new Promise(r => setTimeout(r, 600));
+      console.log('Project Calculator Lead (Local Demo):', payload);
+      try {
+        const stored = JSON.parse(localStorage.getItem('saved_project_leads') || '[]');
+        stored.push(payload);
+        localStorage.setItem('saved_project_leads', JSON.stringify(stored));
+      } catch(e){}
+    }
+
+    submitBtn.disabled = false;
+    if (submitText) submitText.textContent = t('calc.submit');
+
+    // Show Success State
+    if (summaryBadge) summaryBadge.textContent = `${srvTitle} · ${scpTitle} · ~$${calculatedMin} – $${calculatedMax}`;
+    if (formView) formView.style.display = 'none';
+    if (successView) successView.style.display = 'block';
   });
 }
 
