@@ -524,7 +524,16 @@ nav.shrunk{padding:.42rem 1.1rem .42rem 1.4rem;background:linear-gradient(152deg
 .accordion.open .accordion-body{max-height:40000px;opacity:1}
 .portfolio-meta{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:9.5px;letter-spacing:.19em;text-transform:uppercase;color:var(--muted);padding:1.2rem .5rem .9rem}
 .meta-company{color:var(--a2)}
-.carousel-wrap{overflow:hidden;border-radius:var(--r);padding:0 .5rem .5rem}
+.carousel-wrap{overflow:visible;border-radius:var(--r);padding:18px .9rem 1.4rem}
+.accordion.open{overflow:visible}
+.vc-tag-row{display:flex;align-items:center;justify-content:space-between;width:100%}
+.vc-audio-bars{display:inline-flex;align-items:flex-end;gap:2px;height:12px;opacity:0;transition:opacity .25s ease}
+.video-card:hover .vc-audio-bars{opacity:1}
+.vc-audio-bars span{width:2px;background:#00f5c8;border-radius:1px;animation:vcBarBounce .8s ease-in-out infinite alternate}
+.vc-audio-bars span:nth-child(1){height:5px;animation-delay:.1s}
+.vc-audio-bars span:nth-child(2){height:11px;animation-delay:.3s}
+.vc-audio-bars span:nth-child(3){height:7px;animation-delay:.2s}
+@keyframes vcBarBounce{0%{height:3px}100%{height:12px}}
 .carousel{display:flex;gap:7px;align-items:flex-start}
 .masonry-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:7px}
 
@@ -928,7 +937,7 @@ footer a:hover{color:var(--a2)}
       classic motion design and <em>generative AI</em>
     </p>
     <div class="hero-badges">
-      <span class="hero-badge b1">Aiby · Marketing AI</span>
+      <span class="hero-badge b1" data-i18n="hero.badge1">Freelance · ex-Aiby</span>
       <span class="hero-badge b2" data-i18n="hero.badge2">3+ years of experience</span>
       <span class="hero-badge b3">AI-POWERED PRODUCTION STACK</span>
     </div>
@@ -957,8 +966,8 @@ footer a:hover{color:var(--a2)}
     <div class="reveal">
       <h2><span class="fill-a2" data-i18n="about.h1">AI Motion</span><br><span class="irid" data-i18n="about.h2">Designer</span></h2>
       <p class="about-text" data-i18n-html="about.text">
-        Motion Designer with 3+ years of commercial experience in performance marketing and advertising creatives. I specialise in hybrid video production — combining classic motion design in After Effects with generative AI models.<br><br>
-        I track every AI tool release, test on launch day and bring it into production first. I currently work at <strong>Aiby</strong>, building high-conversion video creatives for international AI products.
+        Motion Designer &amp; AI Video Creator with 3+ years of commercial experience in performance marketing and advertising creatives. I specialise in hybrid video production — fusing classic motion design in After Effects with cutting-edge generative AI models.<br><br>
+        Now working as an independent freelance creator for international brands, agencies, and tech products. Previously crafted performance video creatives at <strong>Aiby</strong> (ex-Aiby), scaling global AI apps through viral video production.
       </p>
     </div>
 
@@ -1383,9 +1392,9 @@ const I18N = {
     'nav.about':'About','nav.works':'Works','nav.skills':'Skills','nav.contact':'Contact','nav.calc':'Estimate',
     'hero.label':'Motion Designer / AI Video Creator · Minsk / Remote',
     'hero.role':'I build <em>high-conversion ad creatives</em> at the intersection of<br> classic motion design and <em>generative AI</em>',
-    'hero.badge2':'3+ years of experience','hero.cta':'View works',
+    'hero.badge1':'Freelance · ex-Aiby','hero.badge2':'3+ years of experience','hero.cta':'View works',
     'about.label':'— About','about.h1':'AI Motion','about.h2':'Designer',
-    'about.text':'Motion Designer with 3+ years of commercial experience in performance marketing and advertising creatives. I specialise in hybrid video production — combining classic motion design in After Effects with generative AI models.<br><br>I track every AI tool release, test on launch day and bring it into production first. I currently work at <strong>Aiby</strong>, building high-conversion video creatives for international AI products.',
+    'about.text':'Motion Designer &amp; AI Video Creator with 3+ years of commercial experience in performance marketing and advertising creatives. I specialise in hybrid video production — fusing classic motion design in After Effects with cutting-edge generative AI models.<br><br>Now working as an independent freelance creator for international brands, agencies, and tech products. Previously crafted performance video creatives at <strong>Aiby</strong> (ex-Aiby), scaling global AI apps through viral video production.',
     'stack.title':'AI Production Stack','stack.video':'Video generation','stack.img':'Images &amp; prompts','stack.audio':'Audio &amp; voiceover',
     'stack.auto':'Automation','stack.autov':'n8n · custom AE scripts · ExtendScript','stack.base':'Base AI tech',
     'stat.years':'years of experience','stat.tools':'AI tools in production','stat.projects':'projects','stat.trends':'trends per day',
@@ -1446,9 +1455,9 @@ const I18N = {
     'nav.about':'О себе','nav.works':'Работы','nav.skills':'Навыки','nav.contact':'Контакты','nav.calc':'Рассчитать',
     'hero.label':'Моушн-дизайнер / AI Video Creator · Минск / Удалённо',
     'hero.role':'Создаю <em>рекламные креативы</em> на стыке<br> классического моушн-дизайна и <em>генеративного AI</em>',
-    'hero.badge2':'3+ года опыта','hero.cta':'Смотреть работы',
+    'hero.badge1':'Фриланс · ex-Aiby','hero.badge2':'3+ года опыта','hero.cta':'Смотреть работы',
     'about.label':'— О себе','about.h1':'AI Motion','about.h2':'Designer',
-    'about.text':'Motion Designer с 3+ годами коммерческого опыта в перформанс-маркетинге и рекламных креативах. Специализируюсь на гибридном видеопродакшене — объединяю классический моушн-дизайн в After Effects с генеративными нейросетями.<br><br>Слежу за каждым релизом AI-инструментов, тестирую в день выхода и первым внедряю в продакшн. Сейчас работаю в <strong>Aiby</strong> — создаю высококонверсионные видеокреативы для международных AI-продуктов.',
+    'about.text':'Motion Designer и AI Video Creator с 3+ годами коммерческого опыта в перформанс-маркетинге и рекламных креативах. Специализируюсь на гибридном видеопродакшене — объединяю классический моушн-дизайн в After Effects с передовыми генеративными нейросетями.<br><br>Сейчас работаю на фрилансе с международными брендами, агентствами и продуктовыми командами. Ранее создавал высококонверсионные видеокреативы в <strong>Aiby</strong> (ex-Aiby), масштабируя глобальные AI-продукты.',
     'stack.title':'AI Production Stack','stack.video':'Генерация видео','stack.img':'Изображения и промпты','stack.audio':'Аудио и войсовер',
     'stack.auto':'Автоматизация','stack.autov':'n8n · кастомные AE-скрипты · ExtendScript','stack.base':'Базовые AI-технологии',
     'stat.years':'года опыта','stat.tools':'AI-инструментов в продакшне','stat.projects':'проектов','stat.trends':'трендов в день',
@@ -1590,22 +1599,33 @@ function closeLightbox(){
   document.body.style.overflow = '';
 }
 
-function buildCard(v, i, tag){
+function getCardTag(i, secIdx){
+  if (secIdx === 0) {
+    return (i === 0) ? (LANG === 'ru' ? 'Шоурил' : 'Showreel') : (LANG === 'ru' ? 'Топ работа' : 'Best Work');
+  }
+  return (LANG === 'ru' ? 'AI & МОУШН' : 'AI & MOTION');
+}
+
+function buildCard(v, i, tag, secIdx){
+  const cardTag = getCardTag(i, secIdx);
   const thumb = `https://drive.google.com/thumbnail?id=${v.id}&sz=w600`;
   const grad  = GRADS[i % GRADS.length];
   const card  = document.createElement('div');
   card.className = 'video-card';
   card.innerHTML = `
     <div class="vc-thumb" style="padding-bottom:${v.pb}">
-      <img src="${thumb}" alt="${tag} ${i+1}" loading="lazy"
+      <img src="${thumb}" alt="${cardTag} ${i+1}" loading="lazy"
         onerror="this.style.display='none';this.parentElement.style.background='${grad}'">
     </div>
     <div class="vc-overlay">
       <div class="vc-play">${PLAY}</div>
-      <div class="vc-tag">${tag}</div>
+      <div class="vc-tag-row">
+        <span class="vc-tag">${cardTag}</span>
+        <span class="vc-audio-bars"><span></span><span></span><span></span></span>
+      </div>
       <div class="vc-name">${String(i+1).padStart(2,'0')}</div>
     </div>`;
-  card.addEventListener('click', () => openLightbox(v, tag));
+  card.addEventListener('click', () => openLightbox(v, cardTag));
   return card;
 }
 function getMasonryColumnCount(){
@@ -1665,7 +1685,7 @@ function buildSection(sec, idx){
   const carousel = document.createElement('div');
   carousel.className = 'carousel';
   carousel.id = `car-${idx}`;
-  buildMasonry(sec.videos, sec.tag, carousel);
+  buildMasonry(sec.videos, sec.tag, carousel, idx);
 
   const meta = document.createElement('div');
   meta.className = 'portfolio-meta';
