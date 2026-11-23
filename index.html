@@ -235,51 +235,83 @@ nav.shrunk{padding:.42rem 1.1rem .42rem 1.4rem;background:linear-gradient(152deg
 .video-lightbox-modal{
   position:fixed;inset:0;z-index:999998;
   display:none;align-items:center;justify-content:center;
-  padding:1.5rem;background:rgba(6,6,8,.88);
+  padding:1rem;background:rgba(6,6,8,.92);
   backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   opacity:0;transition:opacity .3s ease;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
 .video-lightbox-modal.open{
   display:flex;opacity:1;
 }
 .vl-container{
   position:relative;width:100%;max-width:880px;
+  max-height:min(94vh,94svh);
   background:linear-gradient(150deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
   border:1px solid rgba(255,255,255,.14);
   border-radius:24px;overflow:hidden;
   box-shadow:0 30px 80px rgba(0,0,0,.85),0 0 50px rgba(0,245,200,.12);
   display:flex;flex-direction:column;
   transform:scale(.95);transition:transform .3s cubic-bezier(.2,.9,.3,1);
+  margin:auto;
 }
 .video-lightbox-modal.open .vl-container{
   transform:scale(1);
 }
 .vl-header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:.9rem 1.4rem;border-bottom:1px solid rgba(255,255,255,.08);
-  background:rgba(12,12,18,.7);
+  padding:.85rem 1.35rem;border-bottom:1px solid rgba(255,255,255,.08);
+  background:rgba(12,12,18,.8);gap:.75rem;
 }
 .vl-tag{
   font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.15em;
   text-transform:uppercase;color:var(--a2);display:flex;align-items:center;gap:.5rem;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .vl-tag::before{
   content:'';width:7px;height:7px;border-radius:50%;background:var(--a2);
-  box-shadow:0 0 10px var(--a2);
+  box-shadow:0 0 10px var(--a2);flex:0 0 auto;
 }
+.vl-header-actions{display:flex;align-items:center;gap:.6rem;flex:0 0 auto}
+.vl-direct-btn{
+  display:inline-flex;align-items:center;gap:.42rem;
+  padding:.35rem .75rem;border-radius:999px;
+  background:rgba(0,245,200,.10);border:1px solid rgba(0,245,200,.35);
+  color:#00f5c8;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;text-decoration:none;
+  transition:all .2s;white-space:nowrap;
+}
+.vl-direct-btn:hover{
+  background:rgba(0,245,200,.22);border-color:rgba(0,245,200,.7);
+  box-shadow:0 0 14px rgba(0,245,200,.3);transform:translateY(-1px);color:#fff;
+}
+.vl-direct-btn svg{transition:transform .2s}
+.vl-direct-btn:hover svg{transform:translate(1px,-1px)}
 .vl-close{
   background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
   color:#fff;width:32px;height:32px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   font-size:16px;cursor:pointer;transition:background .2s,transform .2s;
+  flex:0 0 auto;
 }
 .vl-close:hover{background:rgba(255,60,90,.3);transform:scale(1.08)}
 .vl-player-wrap{
   position:relative;width:100%;padding-top:56.25%;background:#000;
+  flex:1 1 auto;min-height:0;
 }
 .vl-player-wrap iframe{
   position:absolute;inset:0;width:100%;height:100%;border:0;
 }
+.vl-mobile-fallback{
+  display:none;padding:.55rem 1.35rem;
+  background:rgba(0,245,200,.05);border-top:1px solid rgba(0,245,200,.14);
+  font-family:'Space Mono',monospace;font-size:10.5px;color:#c0bed8;
+  align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap;
+}
+.vl-fallback-link{
+  color:#00f5c8;text-decoration:none;font-weight:700;display:inline-flex;align-items:center;gap:.3rem;
+  border-bottom:1px dashed rgba(0,245,200,.6);padding-bottom:1px;transition:color .2s;
+}
+.vl-fallback-link:hover{color:#fff;border-bottom-style:solid}
 .vl-footer{
   display:flex;align-items:center;justify-content:space-between;
   gap:1rem;padding:1.1rem 1.4rem;
@@ -303,6 +335,18 @@ nav.shrunk{padding:.42rem 1.1rem .42rem 1.4rem;background:linear-gradient(152deg
 .vl-cta-btn:hover{
   transform:translateY(-2px) scale(1.03);
   box-shadow:0 8px 25px rgba(255,60,90,.55);
+}
+@media(max-width:768px){
+  .vl-mobile-fallback{display:flex}
+}
+@media(max-width:640px){
+  .vl-container{border-radius:18px}
+  .vl-header{padding:.75rem 1rem}
+  .vl-direct-btn{padding:.3rem .6rem;font-size:9.5px}
+  .vl-mobile-fallback{padding:.5rem 1rem;font-size:10px}
+  .vl-footer{padding:.85rem 1rem;gap:.75rem}
+  .vl-footer-text{font-size:10.5px}
+  .vl-cta-btn{width:100%;justify-content:center;padding:.5rem 1rem;font-size:10.5px}
 }
 
 /* NAV CALC BUTTON */
@@ -560,6 +604,21 @@ nav.shrunk{padding:.42rem 1.1rem .42rem 1.4rem;background:linear-gradient(152deg
 .vc-play svg{margin-left:3px}
 .vc-tag{font-size:7px;letter-spacing:.19em;text-transform:uppercase;color:var(--a2);margin-bottom:.2rem}
 .vc-name{font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;color:var(--ink)}
+
+/* Touch & Mobile — instant 1-tap responsiveness & persistent badges */
+@media (hover: none), (pointer: coarse) {
+  .video-card{cursor:pointer;-webkit-tap-highlight-color:rgba(0,245,200,.15)}
+  .video-card:active{transform:scale(.98)}
+  .vc-overlay{
+    opacity:1!important;
+    background:linear-gradient(to top,rgba(6,6,8,.90) 0%,rgba(6,6,8,.16) 48%,transparent 100%)!important;
+  }
+  .vc-play{
+    transform:translate(-50%,-50%) scale(.92)!important;
+    background:rgba(6,6,8,.75)!important;
+  }
+  .vc-audio-bars{opacity:.85!important}
+}
 
 /* ═══ CONTACT ═══ */
 #contact{text-align:center;position:relative;overflow:hidden}
@@ -1164,10 +1223,22 @@ footer a:hover{color:var(--a2)}
   <div class="vl-container">
     <div class="vl-header">
       <div id="vl-tag" class="vl-tag">AI VIDEO PRODUCTION</div>
-      <button type="button" class="vl-close" id="vl-close-btn" aria-label="Close video">×</button>
+      <div class="vl-header-actions">
+        <a id="vl-direct-link" class="vl-direct-btn" href="#" target="_blank" rel="noopener noreferrer" title="Google Drive">
+          <span data-i18n="vl.open_drive">Open in Drive</span>
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13L13 3M13 3H6M13 3V10"/></svg>
+        </a>
+        <button type="button" class="vl-close" id="vl-close-btn" aria-label="Close video">×</button>
+      </div>
     </div>
     <div class="vl-player-wrap">
-      <iframe id="vl-iframe" src="about:blank" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      <iframe id="vl-iframe" src="about:blank" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen></iframe>
+    </div>
+    <div class="vl-mobile-fallback">
+      <span class="vl-fallback-label" data-i18n="vl.fallback_hint">Video not playing on your phone?</span>
+      <a id="vl-fallback-btn" class="vl-fallback-link" href="#" target="_blank" rel="noopener noreferrer">
+        <span data-i18n="vl.fallback_btn">Watch in Google Drive ↗</span>
+      </a>
     </div>
     <div class="vl-footer">
       <span class="vl-footer-text" data-i18n="vl.footer_text">Like this style? Let's produce a high-conversion video for your product.</span>
@@ -1446,6 +1517,9 @@ const I18N = {
     'calc.success_desc':'Thank you! I have received your request and calculated parameters. I will review your task and get in touch within 2–4 hours.',
     'calc.success_close':'Close',
     'calc.val_err':'Please provide your Telegram or Email so I can reach you.',
+    'vl.open_drive':'Open in Drive',
+    'vl.fallback_hint':'Video not playing on your phone?',
+    'vl.fallback_btn':'Watch in Google Drive ↗',
     'vl.footer_text':'Like this style? Let\'s produce a high-conversion video for your product.',
     'vl.cta':'Calculate Similar Video',
     'bridge.title':'Need a high-impact video in this style?',
@@ -1509,6 +1583,9 @@ const I18N = {
     'calc.success_desc':'Спасибо! Я получил вашу заявку с параметрами расчёта. Ознакомлюсь с задачей и свяжусь с вами в течение 2–4 часов.',
     'calc.success_close':'Закрыть',
     'calc.val_err':'Пожалуйста, укажите ваш Telegram или Email для связи.',
+    'vl.open_drive':'В Google Диск',
+    'vl.fallback_hint':'Видео не запускается на телефоне?',
+    'vl.fallback_btn':'Смотреть в Google Диск ↗',
     'vl.footer_text':'Понравился стиль? Создадим продающий видеоролик под ваш продукт.',
     'vl.cta':'Рассчитать похожий ролик',
     'bridge.title':'Нужен взрывной ролик в таком стиле?',
@@ -1578,13 +1655,21 @@ function openLightbox(v, tag){
   const tagEl = document.getElementById('vl-tag');
   const wrap = document.querySelector('.vl-player-wrap');
   const container = document.querySelector('.vl-container');
+  const directLink = document.getElementById('vl-direct-link');
+  const fallbackBtn = document.getElementById('vl-fallback-btn');
   if (!lb || !iframe) return;
 
   const isVertical = parseFloat(v.pb) > 120;
-  if (wrap) wrap.style.paddingTop = isVertical ? '140%' : '56.25%';
-  if (container) container.style.maxWidth = isVertical ? '460px' : '880px';
+  if (wrap) wrap.style.paddingTop = isVertical ? (window.innerWidth <= 640 ? '125%' : '140%') : '56.25%';
+  if (container) container.style.maxWidth = isVertical ? '440px' : '880px';
 
-  iframe.src = `https://drive.google.com/file/d/${v.id}/preview`;
+  const viewUrl = `https://drive.google.com/file/d/${v.id}/view?usp=sharing`;
+  const previewUrl = `https://drive.google.com/file/d/${v.id}/preview`;
+
+  iframe.src = previewUrl;
+  if (directLink) directLink.href = viewUrl;
+  if (fallbackBtn) fallbackBtn.href = viewUrl;
+
   if (tagEl) tagEl.textContent = (tag || 'PORTFOLIO VIDEO').toUpperCase();
   lb.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1612,6 +1697,9 @@ function buildCard(v, i, tag, secIdx){
   const grad  = GRADS[i % GRADS.length];
   const card  = document.createElement('div');
   card.className = 'video-card';
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('aria-label', `${cardTag} ${String(i+1).padStart(2,'0')}`);
   card.innerHTML = `
     <div class="vc-thumb" style="padding-bottom:${v.pb}">
       <img src="${thumb}" alt="${cardTag} ${i+1}" loading="lazy"
@@ -1625,7 +1713,18 @@ function buildCard(v, i, tag, secIdx){
       </div>
       <div class="vc-name">${String(i+1).padStart(2,'0')}</div>
     </div>`;
-  card.addEventListener('click', () => openLightbox(v, cardTag));
+
+  const onOpen = (e) => {
+    e.preventDefault();
+    openLightbox(v, cardTag);
+  };
+  card.addEventListener('click', onOpen);
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openLightbox(v, cardTag);
+    }
+  });
   return card;
 }
 function getMasonryColumnCount(){
